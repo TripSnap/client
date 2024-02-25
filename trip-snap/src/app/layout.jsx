@@ -1,16 +1,10 @@
-import { Inter } from 'next/font/google'
+import style from '@/root.module.css'
 import '@fontsource/roboto/300.css'
 import '@fontsource/roboto/400.css'
 import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
-import { Container, Typography } from '@mui/material'
-import TopNavigation from '@/components/navication/TopNavication'
+import { Typography } from '@mui/material'
 import './root.css'
-import style from '@/root.module.css'
-import NotiDrawer from '@/components/notification/NotiDrawer'
-import { NotiProvider } from '@/context/NotificationContext'
-
-const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
   title: 'TripSnap',
@@ -27,19 +21,7 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body style={{ margin: 0 }}>
-        <Typography>
-          <NotiProvider>
-            <TopNavigation />
-            <NotiDrawer />
-          </NotiProvider>
-          <Container
-            maxWidth="lg"
-            className={inter.className}
-            sx={{ paddingTop: 'calc(1.5rem + 52px)', overflowY: 'auto' }}
-          >
-            {children}
-          </Container>
-        </Typography>
+        <Typography>{children}</Typography>
       </body>
     </html>
   )
