@@ -7,6 +7,8 @@ import { Container, Typography } from '@mui/material'
 import TopNavigation from '@/components/navication/TopNavication'
 import './root.css'
 import style from '@/root.module.css'
+import NotiDrawer from '@/components/notification/NotiDrawer'
+import { NotiProvider } from '@/context/NotificationContext'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -26,7 +28,10 @@ export default function RootLayout({ children }) {
       </head>
       <body style={{ margin: 0 }}>
         <Typography>
-          <TopNavigation />
+          <NotiProvider>
+            <TopNavigation />
+            <NotiDrawer />
+          </NotiProvider>
           <Container
             maxWidth="lg"
             className={inter.className}

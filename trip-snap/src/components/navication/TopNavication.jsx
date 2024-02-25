@@ -19,12 +19,7 @@ const TopNavigation = () => {
       className={[style.bg]}
     >
       <Grid container columnSpacing={1.2} py={1} px={1.5}>
-        <Grid
-          display={'flex'}
-          flexGrow={'row'}
-          alignItems={'center'}
-          sx={{ pointerEvents: 'none' }}
-        >
+        <Grid display={'flex'} flexGrow={'row'} alignItems={'center'}>
           <h2 style={{ margin: 0, fontWeight: 100 }}>TripSnap</h2>
         </Grid>
         <NavicationMenu />
