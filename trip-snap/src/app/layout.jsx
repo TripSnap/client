@@ -3,7 +3,6 @@ import '@fontsource/roboto/300.css'
 import '@fontsource/roboto/400.css'
 import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
-import { Typography } from '@mui/material'
 import './root.css'
 
 export const metadata = {
@@ -20,9 +19,7 @@ export default function RootLayout({ children }) {
           href="https://fonts.googleapis.com/icon?family=Material+Icons"
         />
       </head>
-      <body style={{ margin: 0 }}>
-        <Typography>{children}</Typography>
-      </body>
+      <body style={{ margin: 0 }}>{children}</body>
     </html>
   )
 }
