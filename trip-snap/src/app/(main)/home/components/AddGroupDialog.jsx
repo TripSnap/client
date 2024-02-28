@@ -1,4 +1,5 @@
 import CustomDialog from '@/components/dialog/CustomDialog'
+import PaperInput from '@/components/input/PaperInput'
 import {
   Avatar,
   Box,
@@ -19,20 +20,7 @@ export default function AddGroupDialog({ isOpen, close }) {
       <>
         <Box sx={{ mt: 0.5 }}>
           <h4 style={{ margin: 0 }}>그룹 이름</h4>
-          <Paper
-            sx={{
-              p: '2px 4px 2px 10px',
-              mt: 0.8,
-              display: 'flex',
-              alignItems: 'center',
-            }}
-          >
-            <InputBase
-              sx={{ flex: 1 }}
-              placeholder="이메일 / 회원번호"
-              inputProps={{ 'aria-label': 'search google maps' }}
-            ></InputBase>
-          </Paper>
+          <PaperInput />
         </Box>
         <Box
           sx={{

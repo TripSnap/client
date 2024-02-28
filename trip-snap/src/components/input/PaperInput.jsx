@@ -1,6 +1,6 @@
 import { InputBase, Paper } from '@mui/material'
 
-export default function PaperInput({ props }) {
+export default function PaperInput({ placeholder = null, ...props }) {
   return (
     <Paper
       sx={{
@@ -10,7 +10,11 @@ export default function PaperInput({ props }) {
         alignItems: 'center',
       }}
     >
-      <InputBase sx={{ flex: 1 }} inputProps={props}></InputBase>
+      <InputBase
+        sx={{ flex: 1 }}
+        placeholder={placeholder}
+        inputProps={props}
+      ></InputBase>
     </Paper>
   )
 }
