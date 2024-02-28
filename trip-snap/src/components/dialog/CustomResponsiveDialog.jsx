@@ -29,7 +29,7 @@ export default function CustomResponsiveDialog({
 
   return (
     <Dialog
-      open={true}
+      open={isOpen}
       onClose={close}
       fullWidth
       maxWidth={'sm'}
