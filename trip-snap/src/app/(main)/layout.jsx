@@ -6,7 +6,7 @@ export default function Layout({ children }) {
   return (
     <>
       <NotiProvider>
-        <TopNavigation />
+        <TopNavigation menu />
         <NotiDrawer />
       </NotiProvider>
       {children}

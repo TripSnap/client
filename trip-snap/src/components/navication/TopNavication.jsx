@@ -1,9 +1,9 @@
-import { Container, Typography } from '@mui/material'
+import style from '@/root.module.css'
+import { Container } from '@mui/material'
 import Grid from '@mui/material/Unstable_Grid2'
 import NavicationMenu from './NavicationMenu'
-import style from '@/root.module.css'
 
-const TopNavigation = () => {
+const TopNavigation = ({ menu = false }) => {
   return (
     <Container
       maxWidth={false}
@@ -22,7 +22,7 @@ const TopNavigation = () => {
         <Grid display={'flex'} flexGrow={'row'} alignItems={'center'}>
           <h2 style={{ margin: 0, fontWeight: 100 }}>TripSnap</h2>
         </Grid>
-        <NavicationMenu />
+        {menu && <NavicationMenu />}
       </Grid>
     </Container>
   )
