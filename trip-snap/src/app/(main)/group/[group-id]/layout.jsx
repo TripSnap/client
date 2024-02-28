@@ -3,9 +3,10 @@ import { Container } from '@mui/material'
 export default function Layout({ children }) {
   return (
     <Container
+      disableGutters
       maxWidth="lg"
       sx={{
-        paddingTop: 'calc(1.5rem + 52px)',
+        paddingTop: '57px',
         overflowY: 'auto',
         minHeight: 'calc(100vh)',
       }}

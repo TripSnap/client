@@ -5,29 +5,36 @@ import {
   DialogTitle,
   Icon,
   IconButton,
-  styled,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material'
 
-const Dialog2 = styled(Dialog)(({ theme }) => ({
-  '.MuiDialog-paper': {
-    [theme.breakpoints.down('sm')]: {
-      marginLeft: 0,
-      marginRight: 0,
-      width: 'calc(100% - 10px)',
-    },
-  },
-}))
-
 /**
- * @param {string} title
+ * @param {string|JSX.Element} title
  * @param {JSX.Element} body
  * @param {JSX.Element} footer
  * @param {boolean} isOpen
  * @param {Function} close
  */
-export default function CustomDialog({ title, body, footer, isOpen, close }) {
+export default function CustomResponsiveDialog({
+  title,
+  body,
+  footer,
+  isOpen,
+  close,
+  breakpoint = 'md',
+}) {
+  const theme = useTheme()
+  const fullScreen = useMediaQuery(theme.breakpoints.down(breakpoint))
+
   return (
-    <Dialog2 open={isOpen} onClose={close} fullWidth maxWidth={'sm'}>
+    <Dialog
+      open={true}
+      onClose={close}
+      fullWidth
+      maxWidth={'sm'}
+      fullScreen={fullScreen}
+    >
       <DialogTitle>{title}</DialogTitle>
       <IconButton
         aria-label="close"
@@ -43,6 +50,6 @@ export default function CustomDialog({ title, body, footer, isOpen, close }) {
       </IconButton>
       <DialogContent dividers>{body}</DialogContent>
       {footer && <DialogActions>{footer}</DialogActions>}
-    </Dialog2>
+    </Dialog>
   )
 }
