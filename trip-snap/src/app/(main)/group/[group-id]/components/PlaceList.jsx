@@ -8,7 +8,7 @@ import {
   ListItemText,
 } from '@mui/material'
 
-export default function PlaceList() {
+export default function PlaceList({ handleClick }) {
   return (
     <List>
       {Array.from(Array(13)).map((e, i) => (
@@ -20,6 +20,7 @@ export default function PlaceList() {
               <LocationSearchingIcon />
             </IconButton>
           }
+          onClick={handleClick}
         >
           <ListItemAvatar>
             <Avatar>A</Avatar>

@@ -19,10 +19,15 @@ import {
 import Grid from '@mui/material/Unstable_Grid2'
 import { useState } from 'react'
 import PlaceList from './components/PlaceList'
+import AlbumDetailDialog from './components/AlbumDetailDialog'
+import AddAlbumDialog from './components/AddAlbumDialog'
 
 export default function Page() {
   const theme = useTheme()
   const isSmallerThanMd = useMediaQuery(theme.breakpoints.down('md'))
+
+  const [openAddModal, setOpenAddModal] = useState(false)
+  const [openDetailModal, setOpenDetailModal] = useState(false)
 
   const [anchorEl, setAnchorEl] = useState(null)
   const menuOpen = Boolean(anchorEl)
@@ -31,6 +36,10 @@ export default function Page() {
   }
   const handleClose = () => {
     setAnchorEl(null)
+  }
+
+  const handlePlaceItemClick = () => {
+    setOpenDetailModal(true)
   }
 
   return (
@@ -96,7 +105,7 @@ export default function Page() {
                 color="primary"
                 aria-label="add"
                 sx={{ right: 20, bottom: 20, position: 'absolute' }}
-                onClick={() => false}
+                onClick={() => setOpenAddModal(true)}
               >
                 <Icon>add</Icon>
               </Fab>
@@ -112,21 +121,28 @@ export default function Page() {
               }}
             >
               <Box overflow={'auto'} maxHeight={'calc(100vh - 150px)'}>
-                <PlaceList />
+                <PlaceList handleClick={handlePlaceItemClick} />
               </Box>
             </Grid>
           )}
         </Grid>
         {isSmallerThanMd && (
           <BottomHandleDrawer title={'51 results'}>
-            <PlaceList />
+            <PlaceList handleClick={handlePlaceItemClick} />
           </BottomHandleDrawer>
         )}
 
         {/* <MemberListDrawer /> */}
-        {/* <AlbumDetailDialog /> */}
+        <AlbumDetailDialog
+          isOpen={openDetailModal}
+          close={() => setOpenDetailModal(false)}
+        />
+        <AddAlbumDialog
+          isOpen={openAddModal}
+          close={() => setOpenAddModal(false)}
+        />
         {/* <EditAlbumDialog /> */}
-        {/* {<AddAlbumDialog />} */}
+        {/* {} */}
         {/* <EditAlbumPhotoDialog /> */}
       </Paper>
     </>

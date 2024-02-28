@@ -3,10 +3,11 @@ import { Button } from '@mui/material'
 import AlbumForm from './AlbumForm'
 import AlbumPhotoForm from './AlbumPhotoForm'
 
-export default function AddAlbumDialog() {
+export default function AddAlbumDialog({ isOpen, close }) {
   return (
     <CustomResponsiveDialog
-      isOpen={true}
+      isOpen={isOpen}
+      close={close}
       title={'기록 추가'}
       body={
         <>
