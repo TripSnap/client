@@ -21,6 +21,7 @@ import { useState } from 'react'
 import PlaceList from './components/PlaceList'
 import AlbumDetailDialog from './components/AlbumDetailDialog'
 import AddAlbumDialog from './components/AddAlbumDialog'
+import Map from './components/Map'
 
 export default function Page() {
   const theme = useTheme()
@@ -93,14 +94,13 @@ export default function Page() {
             </Button>
             <Box
               sx={{
-                backgroundColor: 'green',
                 position: 'relative',
                 ...(isSmallerThanMd
                   ? { height: 'calc(100vh - 95px - 56px)' }
                   : { height: '100%' }),
               }}
             >
-              지도
+              <Map />
               <Fab
                 color="primary"
                 aria-label="add"
