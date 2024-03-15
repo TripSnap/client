@@ -16,7 +16,14 @@ export default function PlaceList({ handleClick }) {
           divider={true}
           key={i}
           secondaryAction={
-            <IconButton edge="end" aria-label="delete">
+            <IconButton
+              edge="end"
+              aria-label="delete"
+              onClick={(e) => {
+                e.stopPropagation()
+                console.log('click')
+              }}
+            >
               <LocationSearchingIcon />
             </IconButton>
           }
