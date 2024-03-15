@@ -9,7 +9,7 @@ import {
   SpeedDialAction,
   SpeedDialIcon,
 } from '@mui/material'
-import SquareImageList from './SquareImageList'
+import SquareImageList from '../SquareImageList'
 import { useState } from 'react'
 import EditAlbumPhotoDialog from './EditAlbumPhotoDialog'
 import EditIcon from '@mui/icons-material/Edit'

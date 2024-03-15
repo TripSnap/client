@@ -19,9 +19,9 @@ import {
 import Grid from '@mui/material/Unstable_Grid2'
 import { useState } from 'react'
 import PlaceList from './components/PlaceList'
-import AlbumDetailDialog from './components/AlbumDetailDialog'
-import AddAlbumDialog from './components/AddAlbumDialog'
-import Map from './components/Map'
+import AddAlbumDialog from './components/dialog/AddAlbumDialog'
+import AlbumDetailDialog from './components/dialog/AlbumDetailDialog'
+import Map from './components/map/Map'
 
 export default function Page() {
   const theme = useTheme()
@@ -86,6 +86,8 @@ export default function Page() {
                 position: 'absolute',
                 width: 36,
                 zIndex: 100,
+                minWidth: 0,
+                padding: 1,
               }}
               variant="contained"
               color="warning"
@@ -100,7 +102,7 @@ export default function Page() {
                   : { height: '100%' }),
               }}
             >
-              <Map />
+              <Map markerClickHandler={() => setOpenDetailModal(true)} />
               <Fab
                 color="primary"
                 aria-label="add"

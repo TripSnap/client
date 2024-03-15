@@ -1,6 +1,6 @@
 import CustomResponsiveDialog from '@/components/dialog/CustomResponsiveDialog'
 import { Button } from '@mui/material'
-import AlbumPhotoForm from './AlbumPhotoForm'
+import AlbumPhotoForm from '../AlbumPhotoForm'
 
 export default function AddAlbumPhotoDialog({ isOpen, close }) {
   return (
