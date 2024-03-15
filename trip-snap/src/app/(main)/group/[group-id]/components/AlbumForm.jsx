@@ -1,11 +1,19 @@
 import PaperInput from '@/components/input/PaperInput'
 import { Box, Paper, styled } from '@mui/material'
+import { useEffect, useState } from 'react'
+import Map from './map/Map'
 
 const MarginBox = styled(Box)(({ theme }) => ({
   marginTop: '0.5rem',
 }))
 
 export default function AlbumForm() {
+  const [address, setAddress] = useState('')
+  const [latLng, setLatLng] = useState([])
+  useEffect(() => {
+    console.log(latLng)
+  }, [latLng])
+
   return (
     <Box>
       <MarginBox>
@@ -27,8 +35,12 @@ export default function AlbumForm() {
             height: '300px',
           }}
         >
-          지도
+          <Map useMarker setAddress={setAddress} setLatLng={setLatLng} />
         </Paper>
+      </MarginBox>
+      <MarginBox>
+        <h4 style={{ margin: 0 }}>주소</h4>
+        <PaperInput value={address} readOnly></PaperInput>
       </MarginBox>
     </Box>
   )

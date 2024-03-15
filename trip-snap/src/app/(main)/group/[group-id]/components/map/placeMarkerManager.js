@@ -4,7 +4,7 @@ import Marker from './Marker'
 
 // TODO: 클릭 이벤트 -> selected 활성화
 // TODO: selected만 활성화 시키는 경우도 추가해야함 (PlaceList secondary button)
-export default function MarkerManager({ map, clickHandler }) {
+export default function placeMarkerManager({ map, clickHandler }) {
   const [selected, setSelected] = useState(null)
   const markers = useRef([])
 

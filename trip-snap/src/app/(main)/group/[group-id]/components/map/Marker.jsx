@@ -35,7 +35,6 @@ export default function Marker({ selected }) {
             height: '3.5rem',
             borderRadius: '0.375rem',
             objectFit: 'cover',
-
             zIndex: 1,
           }}
         />

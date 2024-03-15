@@ -102,7 +102,10 @@ export default function Page() {
                   : { height: '100%' }),
               }}
             >
-              <Map markerClickHandler={() => setOpenDetailModal(true)} />
+              <Map
+                markerClickHandler={() => setOpenDetailModal(true)}
+                usePlaceMarker
+              />
               <Fab
                 color="primary"
                 aria-label="add"
@@ -141,6 +144,7 @@ export default function Page() {
         />
         <AddAlbumDialog
           isOpen={openAddModal}
+          // isOpen={true}
           close={() => setOpenAddModal(false)}
         />
         {/* <EditAlbumDialog /> */}

@@ -1,21 +1,33 @@
+import { LocationSearching, Search } from '@mui/icons-material'
+import { Button, ButtonGroup } from '@mui/material'
 import { useEffect, useRef, useState } from 'react'
-import MarkerManager from './MarkerManager'
-import { Button } from '@mui/material'
-import { LocationSearching } from '@mui/icons-material'
+import placeMarkerManager from './placeMarkerManager'
+import locationMarkerManager from './locationMarkerManager'
 
 // TODO: props 위도 경도 받기..
-export default function Map({ markerClickHandler }) {
+export default function Map({
+  markerClickHandler,
+  useMarker,
+  usePlaceMarker,
+  setAddress,
+  setLatLng,
+}) {
   const container = useRef(null)
   const [map, setMap] = useState(null)
-  MarkerManager({ map, clickHandler: markerClickHandler })
+  const placeMarker =
+    usePlaceMarker &&
+    placeMarkerManager({ map, clickHandler: markerClickHandler })
+  const locationMarker =
+    useMarker && locationMarkerManager({ map, setAddress, setLatLng })
 
-  const initMap = (lat, lng) => {
+  const initMap = ({ lat, lng } = {}) => {
     setMap(
       new kakao.maps.Map(container.current, {
         // center: new kakao.maps.LatLng(lat ?? 37.5664056, lng ?? 126.9778222),
         center: new kakao.maps.LatLng(37.56646, 126.97761),
         level: 3,
         mapTypeId: kakao.maps.MapTypeId.ROADMAP,
+        tileAnimation: false,
       })
     )
   }
@@ -41,7 +53,7 @@ export default function Map({ markerClickHandler }) {
     const init = async () => {
       try {
         const { lat, lng } = await getCurrentPosition()
-        initMap(lat, lng)
+        initMap({ lat, lng })
       } catch (e) {
         // 위치정보를 불러올수 없으요
         initMap()
@@ -57,6 +69,7 @@ export default function Map({ markerClickHandler }) {
     try {
       const { lat, lng } = await getCurrentPosition()
       map.setCenter(new kakao.maps.LatLng(lat, lng))
+      locationMarker && locationMarker.setMarker({ lat, lng })
     } catch (e) {
       // 위치정보를 불러올수 없으요
     }
@@ -65,27 +78,40 @@ export default function Map({ markerClickHandler }) {
   return (
     <div style={{ width: '100%', height: '100%', position: 'relative' }}>
       {map && (
-        <Button
-          variant="contained"
-          color="success"
+        <ButtonGroup
+          variant="outlined"
+          color="primary"
           sx={{
             position: 'absolute',
             zIndex: 100,
             right: 5,
             top: 5,
-            minWidth: 0,
-            padding: 1,
+            background: 'white',
           }}
-          onClick={setCurrentLocation}
         >
-          <LocationSearching />
-        </Button>
+          {/* {useMarker && (
+            <Button
+              sx={{
+                minWidth: 0,
+                padding: 1,
+              }}
+              onClick={setCurrentLocation}
+            >
+              <Search />
+            </Button>
+          )} */}
+          <Button
+            sx={{
+              minWidth: 0,
+              padding: 1,
+            }}
+            onClick={setCurrentLocation}
+          >
+            <LocationSearching />
+          </Button>
+        </ButtonGroup>
       )}
-      <div
-        id="map"
-        style={{ width: '100%', height: '100%' }}
-        ref={container}
-      ></div>
+      <div style={{ width: '100%', height: '100%' }} ref={container}></div>
     </div>
   )
 }
