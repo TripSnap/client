@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { renderToString } from 'react-dom/server'
 import Marker from './Marker'
 import { usePlaceListContext } from './PlaceListProvider'
@@ -22,10 +22,11 @@ export default function placeMarkerManager({ map }) {
       setMarker(marker, dom, false)
     })
     if (selected) {
-      const [{ marker, dom }] = markers.filter(
+      const [{ marker, dom, data }] = markers.filter(
         ({ data }) => data.id == selected
       )
       setMarker(marker, dom, true)
+      map.panTo(new kakao.maps.LatLng(data.lat, data.lng))
     }
   }, [selected])
 
