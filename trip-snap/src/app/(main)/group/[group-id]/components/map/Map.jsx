@@ -6,17 +6,14 @@ import locationMarkerManager from './locationMarkerManager'
 
 // TODO: props 위도 경도 받기..
 export default function Map({
-  markerClickHandler,
-  useMarker,
   usePlaceMarker,
+  useMarker,
   setAddress,
   setLatLng,
 }) {
   const container = useRef(null)
   const [map, setMap] = useState(null)
-  const placeMarker =
-    usePlaceMarker &&
-    placeMarkerManager({ map, clickHandler: markerClickHandler })
+  const placeMarker = usePlaceMarker && placeMarkerManager({ map })
   const locationMarker =
     useMarker && locationMarkerManager({ map, setAddress, setLatLng })
 

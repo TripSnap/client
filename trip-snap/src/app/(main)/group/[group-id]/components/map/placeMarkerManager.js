@@ -1,54 +1,55 @@
 import { useEffect, useRef, useState } from 'react'
 import { renderToString } from 'react-dom/server'
 import Marker from './Marker'
+import { usePlaceListContext } from './PlaceListProvider'
 
 // TODO: 클릭 이벤트 -> selected 활성화
 // TODO: selected만 활성화 시키는 경우도 추가해야함 (PlaceList secondary button)
-export default function placeMarkerManager({ map, clickHandler }) {
-  const [selected, setSelected] = useState(null)
-  const markers = useRef([])
+export default function placeMarkerManager({ map }) {
+  const { placeList, selected, setSelected, setOpenDetailModal } =
+    usePlaceListContext()
+  const [markers, setMarkers] = useState([])
 
   useEffect(() => {
-    if (map) {
-      markers.current = Array(10)
-        .fill(0)
-        .map((e, i) => createMarker(i + 1))
-    }
-  }, [map])
+    setMarkers((prevMarkers) => {
+      prevMarkers.map(removeMarker)
+      return placeList.map(createMarker)
+    })
+  }, [placeList, map])
 
   useEffect(() => {
-    markers.current.forEach(({ marker, dom }) => {
+    markers.forEach(({ marker, dom }) => {
       setMarker(marker, dom, false)
     })
     if (selected) {
-      const { marker, dom } = markers.current[selected - 1]
+      const [{ marker, dom }] = markers.filter(
+        ({ data }) => data.id == selected
+      )
       setMarker(marker, dom, true)
     }
   }, [selected])
 
-  const createMarker = (i, lat, lng, selected) => {
+  const createMarker = (data) => {
+    const { lat, lng, photo, id } = data
     const dom = document.createElement('div')
-    dom.innerHTML = renderToString(<Marker selected={selected} />)
+    dom.innerHTML = renderToString(<Marker />)
 
     const marker = new kakao.maps.CustomOverlay({
       map: map,
       content: dom,
       clickable: true,
-      position: new kakao.maps.LatLng(
-        37.56646 + i / 3000,
-        126.97761 + i / 3000
-      ),
+      position: new kakao.maps.LatLng(lat, lng),
       xAnchor: 0.5,
       yAnchor: 1.2,
     })
     marker.setMap(map)
 
     dom.addEventListener('click', () => {
-      setSelected(i)
-      clickHandler(i)
+      setSelected(id)
+      setOpenDetailModal(true)
     })
 
-    return { marker, dom }
+    return { marker, dom, data }
   }
 
   const setMarker = (marker, dom, selected) => {
@@ -56,6 +57,10 @@ export default function placeMarkerManager({ map, clickHandler }) {
     marker.setContent(null)
     marker.setContent(dom)
     marker.setZIndex(selected ? 10 : 0)
+  }
+
+  const removeMarker = ({ marker }) => {
+    marker.setMap(null)
   }
 
   return {}
