@@ -1,5 +1,5 @@
 import CustomResponsiveDialog from '@/components/dialog/CustomResponsiveDialog'
-import SquareImageList from './SquareImageList'
+import SquareImageList from '../SquareImageList'
 import { Button } from '@mui/material'
 
 export default function EditAlbumPhotoDialog({ isOpen, close }) {
