@@ -14,6 +14,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={[style.bg]} style={{ overflowX: 'hidden' }}>
       <head>
+        <meta name="referrer" content="origin-when-cross-origin" />
         <link
           rel="stylesheet"
           href="https://fonts.googleapis.com/icon?family=Material+Icons"
