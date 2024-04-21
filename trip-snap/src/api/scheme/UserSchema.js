@@ -2,6 +2,10 @@ import { boolean, object, string } from 'yup'
 import { pureFetchData } from '@/utils/fetch'
 import { debounceAsync } from '@/utils/utils'
 
+const Regexp = Object.freeze({
+  PASSWORD: /^(?=.*[a-zA-Z])(?=.*[0-9]).{12,100}$/,
+  NICKNAME: /^[a-zA-Z가-힣][0-9a-zA-Z가-힣]{4,19}$/,
+})
 export const joinSchema = object({
   email: string()
     .required('이메일은 필수 항목입니다.')
@@ -9,7 +13,7 @@ export const joinSchema = object({
     .test({
       test: debounceAsync(2000, async (value, context) => {
         const response = await pureFetchData('/join/check-email', {
-          method: 'post',
+          method: 'POST',
           body: { email: value },
         })
         if (response.ok) {
@@ -33,10 +37,7 @@ export const joinSchema = object({
     }),
   password: string()
     .required('비밀번호는 필수 항목입니다.')
-    .matches(
-      /^(?=.*[a-zA-Z])(?=.*[0-9]).{12,100}$/,
-      '길이 12 ~ 100의 영어와 숫자를 포함해야 합니다.'
-    ),
+    .matches(Regexp.PASSWORD, '길이 12 ~ 100의 영어와 숫자를 포함해야 합니다.'),
   confirmPassword: string().when(['password'], ([password], schema) => {
     return schema.test({
       test: (confirmPassword) => password === confirmPassword,
@@ -45,10 +46,7 @@ export const joinSchema = object({
   }),
   nickname: string()
     .required('닉네임은 필수 항목입니다.')
-    .matches(
-      /^[a-zA-Z가-힣][0-9a-zA-Z가-힣]{4,19}$/,
-      '5~20글자의 영어 또는 한글로 시작해야 합니다.'
-    ),
+    .matches(Regexp.NICKNAME, '5~20글자의 영어 또는 한글로 시작해야 합니다.'),
   checkEmail: boolean().required('이메일 중복 체크가 필요합니다.'),
 })
 
@@ -58,19 +56,33 @@ export const verifyEmailSchema = object({
 })
 
 export const updateMemberDataSchema = object({
-  nickname: string()
-    .matches(/^[a-zA-Z가-힣][0-9a-zA-Z가-힣]{4,19}$/)
-    .notRequired(),
+  nickname: string().matches(
+    Regexp.NICKNAME,
+    '5~20글자의 영어 또는 한글로 시작해야 합니다.'
+  ),
   photo: string().min(10).max(50).notRequired(),
 })
 
 export const updatePasswordSchema = object({
-  password: string()
-    .matches(/^(?=.*[a-zA-Z])(?=.*[0-9]).{12,100}$/)
-    .required(),
+  password: string().required('비밀번호는 필수 항목입니다.'),
   newPassword: string()
-    .matches(/^(?=.*[a-zA-Z])(?=.*[0-9]).{12,100}$/)
-    .required(),
+    .matches(Regexp.PASSWORD, '길이 12 ~ 100의 영어와 숫자를 포함해야 합니다.')
+    .required('비밀번호는 필수 항목입니다.')
+    .when(['password'], ([password], schema) => {
+      return schema.test({
+        test: (confirmNewPassword) => password !== confirmNewPassword,
+        message: '이전 비밀번호와 다른 비밀번호를 설정하세요.',
+      })
+    }),
+  confirmNewPassword: string().when(
+    ['newPassword'],
+    ([newPassword], schema) => {
+      return schema.test({
+        test: (confirmNewPassword) => newPassword === confirmNewPassword,
+        message: '비밀번호와 일치하지 않습니다.',
+      })
+    }
+  ),
 })
 
 export const loginSchema = object({

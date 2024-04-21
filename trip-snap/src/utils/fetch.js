@@ -55,6 +55,7 @@ export const fetchData = async (url, router, option = {}) => {
     return response
   } catch (e) {
     errorAlert({ message: '요청을 실패했습니다.' })
+    return Response.error()
   }
 }
 

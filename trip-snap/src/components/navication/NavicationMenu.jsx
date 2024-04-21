@@ -5,17 +5,31 @@ import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNone
 import { Avatar, Badge, Fab, Menu, MenuItem } from '@mui/material'
 import Grid from '@mui/material/Unstable_Grid2'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { fetchData } from '@/utils/fetch'
+import { removeToken } from '@/utils/AuthUtil'
 
 export default function NavicationMenu() {
   const { open } = useNotiContext()
   const [anchorEl, setAnchorEl] = useState(null)
   const menuOpen = Boolean(anchorEl)
+  const router = useRouter()
+
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget)
   }
   const handleClose = () => {
     setAnchorEl(null)
   }
+
+  const logout = async () => {
+    const response = await fetchData('/logout', router, {
+      method: 'GET',
+    })
+    removeToken()
+    router.replace('/login')
+  }
+
   return (
     <>
       <Grid ml={'auto'} display={'flex'} flexGrow={'row'} alignItems={'center'}>
@@ -53,7 +67,6 @@ export default function NavicationMenu() {
         id="basic-menu"
         anchorEl={anchorEl}
         open={menuOpen}
-        // onClose={handleClose}
         MenuListProps={{
           'aria-labelledby': 'basic-button',
         }}
@@ -63,9 +76,22 @@ export default function NavicationMenu() {
         }}
         onClose={handleClose}
       >
-        <MenuItem>Profile</MenuItem>
-        <MenuItem>My account</MenuItem>
-        <MenuItem>Logout</MenuItem>
+        <MenuItem
+          onClick={() => {
+            handleClose()
+            router.push('/user')
+          }}
+        >
+          정보 수정
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            handleClose()
+            logout()
+          }}
+        >
+          로그아웃
+        </MenuItem>
       </Menu>
     </>
   )

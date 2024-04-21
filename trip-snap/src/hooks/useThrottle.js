@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react'
 
-export function useThrottle(t, func) {
+export function useThrottle(t, func, deps = []) {
   const [waiting, setWaiting] = useState()
   const callback = useCallback(
     (...params) => {
@@ -14,7 +14,7 @@ export function useThrottle(t, func) {
         func(...params)
       }
     },
-    [waiting]
+    [waiting, ...deps]
   )
   return { callback }
 }
