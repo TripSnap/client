@@ -6,9 +6,9 @@ import {
 import { errorAlert } from '@/utils/alertUtil'
 
 export const fetchData = async (url, router, option = {}) => {
-  const { method, contentType, body, retry } = option
+  const { method = 'GET', contentType, body, retry } = option
   const fetchOption = {
-    method,
+    method: method.toUpperCase(),
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
   }
@@ -22,7 +22,7 @@ export const fetchData = async (url, router, option = {}) => {
 
   let fetchUrl = process.env.NEXT_PUBLIC_API_URL + url
   if (!!body) {
-    if (method.toLocaleLowerCase() === 'get') {
+    if (fetchOption.method.toUpperCase() === 'GET') {
       const _url = new URL(fetchUrl)
       for (const k in body) {
         _url.searchParams.set(k, body[k])
@@ -58,17 +58,17 @@ export const fetchData = async (url, router, option = {}) => {
   }
 }
 
-export const pureFetchData = async (url, option) => {
-  const { method, contentType, body } = option
+export const pureFetchData = async (url, option = {}) => {
+  const { method = 'GET', contentType, body } = option
 
   let fetchUrl = process.env.NEXT_PUBLIC_API_URL + url
   const fetchOption = {
-    method,
+    method: method.toUpperCase(),
     headers: { 'Content-Type': 'application/json' },
   }
 
   if (!!body) {
-    if (method.toLocaleLowerCase() === 'get') {
+    if (fetchOption.method.toLocaleLowerCase() === 'GET') {
       const _url = new URL(fetchUrl)
       for (const k in body) {
         _url.searchParams.set(k, body[k])

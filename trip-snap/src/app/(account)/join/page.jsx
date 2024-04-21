@@ -22,7 +22,7 @@ export default function Page() {
 
   const { callback: submit } = useThrottle(2000, async (value) => {
     const response = await fetchData('/join', router, {
-      method: 'post',
+      method: 'POST',
       body: value,
     })
     const result = await response.json()
