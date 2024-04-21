@@ -8,7 +8,6 @@ export const joinSchema = object({
     .email('이메일 형식이 올바르지 않습니다.')
     .test({
       test: debounceAsync(2000, async (value, context) => {
-        if (context.parent.checkEmail) return true
         const response = await pureFetchData('/join/check-email', {
           method: 'post',
           body: { email: value },
@@ -17,14 +16,17 @@ export const joinSchema = object({
           const data = await response.json()
           if (data.success) {
             const [obj] = context.from
-            obj.value['checkEmail'] = true
+            obj.value.checkEmail = true
+            return data.success
           } else {
-            context.createError({ message: data.message })
+            return context.createError({ path: 'email', message: data.message })
           }
-          return data.success
         }
         if (400 <= response.status && response.status <= 499) {
-          context.createError({ message: '이메일 형식이 올바르지 않습니다.' })
+          return context.createError({
+            path: 'email',
+            message: '이메일 형식이 올바르지 않습니다.',
+          })
         }
         return false
       }),

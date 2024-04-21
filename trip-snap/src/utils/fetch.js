@@ -3,12 +3,14 @@ import {
   getAccessToken,
   removeToken,
 } from '@/utils/AuthUtil'
+import { errorAlert } from '@/utils/alertUtil'
 
 export const fetchData = async (url, router, option = {}) => {
   const { method, contentType, body, retry } = option
   const fetchOption = {
     method,
     headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
   }
 
   if (getAccessToken()) {
@@ -31,25 +33,28 @@ export const fetchData = async (url, router, option = {}) => {
     }
   }
 
-  const response = await fetch(fetchUrl, fetchOption)
-  if (response.ok) {
-    return response
-  }
-  if (response.status === 401) {
-    const requiredAuthenticateHeader = response.headers.get('WWW-Authenticate')
-    if (requiredAuthenticateHeader === 'Refresh-Token') {
-      if (!retry) {
-        await fetchRefreshToken()
-        return await fetchData(url, router, { ...option, retry: true })
-      } else {
+  try {
+    const response = await fetch(fetchUrl, fetchOption)
+    if (response.status === 401) {
+      const requiredAuthenticateHeader =
+        response.headers.get('WWW-Authenticate')
+      if (requiredAuthenticateHeader === 'Refresh-Token') {
+        if (!retry) {
+          await fetchRefreshToken()
+          return await fetchData(url, router, { ...option, retry: true })
+        } else {
+          removeToken()
+          router.replace('/login')
+        }
+      }
+      if (requiredAuthenticateHeader === 'Bearer') {
         removeToken()
         router.replace('/login')
       }
     }
-    if (requiredAuthenticateHeader === 'Bearer') {
-      removeToken()
-      router.replace('/login')
-    }
+    return response
+  } catch (e) {
+    errorAlert({ message: '요청을 실패했습니다.' })
   }
 }
 

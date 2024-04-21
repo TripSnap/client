@@ -8,13 +8,13 @@ import './root.css'
 export const metadata = {
   title: 'TripSnap',
   description: 'Record your travels',
+  referrer: 'origin-when-cross-origin',
 }
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={[style.bg]} style={{ overflowX: 'hidden' }}>
       <head>
-        <meta name="referrer" content="origin-when-cross-origin" />
         <link
           rel="stylesheet"
           href="https://fonts.googleapis.com/icon?family=Material+Icons"
