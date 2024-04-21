@@ -17,7 +17,7 @@ export default function Page() {
   const resolver = useValidationResolver(joinSchema)
   const { handleSubmit, control, setValue, watch } = useForm({
     resolver,
-    mode: 'onChange',
+    mode: 'all',
   })
 
   const { callback: submit } = useThrottle(2000, async (value) => {

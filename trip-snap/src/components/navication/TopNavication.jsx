@@ -2,6 +2,7 @@ import style from '@/root.module.css'
 import { Container } from '@mui/material'
 import Grid from '@mui/material/Unstable_Grid2'
 import NavicationMenu from './NavicationMenu'
+import ServiceTitle from '@/components/navication/ServiceTitle'
 
 const TopNavigation = ({ menu = false }) => {
   return (
@@ -20,7 +21,7 @@ const TopNavigation = ({ menu = false }) => {
     >
       <Grid container columnSpacing={1.2} py={1} px={1.5}>
         <Grid display={'flex'} flexGrow={'row'} alignItems={'center'}>
-          <h2 style={{ margin: 0, fontWeight: 100 }}>TripSnap</h2>
+          <ServiceTitle />
         </Grid>
         {menu && <NavicationMenu />}
       </Grid>

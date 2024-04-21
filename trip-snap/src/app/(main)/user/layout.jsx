@@ -6,7 +6,8 @@ export default function Layout({ children }) {
       maxWidth="lg"
       sx={{
         paddingTop: 'calc(1.5rem + 52px)',
-        overflowY: 'auto',
+        paddingBottom: '1.5rem',
+        overflowY: 'hidden',
         minHeight: 'calc(100vh)',
       }}
     >
