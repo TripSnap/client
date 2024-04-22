@@ -4,6 +4,7 @@ import '@fontsource/roboto/400.css'
 import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
 import './root.css'
+import ReactQueryProviders from '@/context/ReactQueryProvider'
 
 export const metadata = {
   title: 'TripSnap',
@@ -20,7 +21,13 @@ export default function RootLayout({ children }) {
           href="https://fonts.googleapis.com/icon?family=Material+Icons"
         />
       </head>
-      <body style={{ margin: 0 }}>{children}</body>
+      <body style={{ margin: 0 }}>
+        <ReactQueryProviders>{children}</ReactQueryProviders>
+
+        <script
+          src={`//dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.KAKAO_MAP_KEY}&libraries=services,drawing`}
+        ></script>
+      </body>
     </html>
   )
 }
