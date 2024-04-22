@@ -8,6 +8,7 @@ import './root.css'
 export const metadata = {
   title: 'TripSnap',
   description: 'Record your travels',
+  referrer: 'origin-when-cross-origin',
 }
 
 export default function RootLayout({ children }) {
