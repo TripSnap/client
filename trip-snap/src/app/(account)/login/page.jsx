@@ -22,7 +22,7 @@ export default function Page() {
   const { callback: submit } = useThrottle(2000, async (value) => {
     const response = await fetchData('/login', router, {
       method: 'POST',
-      body: value,
+      data: value,
     })
     if (response.ok) {
       const accessToken = response.headers.get('Authorization')

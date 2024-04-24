@@ -1,4 +1,4 @@
-import { LocationSearching, Search } from '@mui/icons-material'
+import { LocationSearching } from '@mui/icons-material'
 import { Button, ButtonGroup } from '@mui/material'
 import { useEffect, useRef, useState } from 'react'
 import placeMarkerManager from './placeMarkerManager'

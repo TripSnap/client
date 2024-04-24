@@ -6,7 +6,6 @@ import {
   Button,
   Checkbox,
   Chip,
-  InputBase,
   List,
   ListItem,
   ListItemAvatar,

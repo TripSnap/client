@@ -42,3 +42,6 @@ body {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
+.swal2-container {
+  z-index: 9999;
+}

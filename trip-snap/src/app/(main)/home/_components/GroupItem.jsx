@@ -1,10 +1,4 @@
-import {
-  Card,
-  CardActionArea,
-  CardContent,
-  CardMedia,
-  Typography,
-} from '@mui/material'
+import { Card, CardActionArea, CardContent, Typography } from '@mui/material'
 
 export default function GroupItem({ data, router }) {
   return (

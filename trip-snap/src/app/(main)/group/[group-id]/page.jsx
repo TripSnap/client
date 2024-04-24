@@ -13,9 +13,8 @@ import {
   useTheme,
 } from '@mui/material'
 import { useState } from 'react'
-import AddAlbumDialog from './components/dialog/AddAlbumDialog'
-import PlaceListMap from './components/map/PlaceListMap'
-import { PlaceListProvider } from './components/map/PlaceListProvider'
+import PlaceListMap from '@/app/(main)/group/[group-id]/_components/map/PlaceListMap'
+import { PlaceListProvider } from '@/app/(main)/group/[group-id]/_components/map/PlaceListProvider'
 
 export default function Page() {
   const theme = useTheme()

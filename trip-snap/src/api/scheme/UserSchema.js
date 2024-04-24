@@ -14,7 +14,7 @@ export const joinSchema = object({
       test: debounceAsync(2000, async (value, context) => {
         const response = await pureFetchData('/join/check-email', {
           method: 'POST',
-          body: { email: value },
+          data: { email: value },
         })
         if (response.ok) {
           const data = await response.json()

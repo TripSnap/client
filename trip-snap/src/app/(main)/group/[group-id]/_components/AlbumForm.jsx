@@ -1,6 +1,6 @@
 import PaperInput from '@/components/input/PaperInput'
 import { Box, Paper, styled, useMediaQuery, useTheme } from '@mui/material'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import Map from './map/Map'
 import dayjs from 'dayjs'
 import {

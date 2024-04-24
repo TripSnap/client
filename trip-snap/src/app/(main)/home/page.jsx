@@ -3,10 +3,10 @@ import { setBodyScroll } from '@/utils/utils'
 import { TabContext, TabPanel } from '@mui/lab'
 import { Box, Fab, Icon, Paper, Tab, Tabs } from '@mui/material'
 import { useEffect, useState } from 'react'
-import AddFriendDialog from './components/AddFriendDialog'
-import AddGroupDialog from './components/AddGroupDialog'
-import FriendList from './components/FriendList'
-import GroupList from './components/GroupList'
+import AddFriendDialog from '@/app/(main)/home/_components/AddFriendDialog'
+import AddGroupDialog from '@/app/(main)/home/_components/AddGroupDialog'
+import FriendList from '@/app/(main)/home/_components/FriendList'
+import GroupList from '@/app/(main)/home/_components/GroupList'
 
 export default function Page() {
   const [value, setValue] = useState('group') // group, friend

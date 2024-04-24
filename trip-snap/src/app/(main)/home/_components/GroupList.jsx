@@ -21,7 +21,7 @@ export default function GroupList() {
       queryFn: async ({ pageParam }) => {
         try {
           const response = await fetchData('/group/list', router, {
-            body: { pagePerCnt: 20, page: pageParam },
+            data: { pagePerCnt: 20, page: pageParam },
           })
           if (response.ok) {
             const { data } = await response.json()

@@ -68,7 +68,7 @@ export default function Page() {
       if (Object.keys(body).length > 0) {
         const response = await fetchData('/account/user', router, {
           method: 'PATCH',
-          body,
+          data: body,
         })
         if (response.ok) {
           const data = await response.json()
@@ -90,7 +90,7 @@ export default function Page() {
     const { password, newPassword } = data
     const response = await fetchData('/account/user/password', router, {
       method: 'PATCH',
-      body: { password, newPassword },
+      data: { password, newPassword },
     })
     if (response.ok) {
       const data = await response.json()
