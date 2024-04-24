@@ -12,7 +12,7 @@ import { useInView } from 'react-intersection-observer'
 export default function GroupList() {
   const router = useRouter()
   const { ref, inView } = useInView()
-  const [fetchEnable, setFetchEnable] = useState(true)
+  const [fetchEnable, setFetchEnable] = useState(false)
   const { data, isFetching, hasNextPage, fetchNextPage, isFetchingNextPage } =
     useInfiniteQuery({
       queryKey: ['group', fetchEnable],
@@ -45,6 +45,11 @@ export default function GroupList() {
       getPreviousPageParam: (firstPage, allPages, firstPageParam) =>
         !!firstPageParam ? firstPageParam + 1 : undefined,
     })
+
+  useEffect(() => {
+    setFetchEnable(true)
+    return () => setFetchEnable(false)
+  }, [])
 
   useEffect(() => {
     if (inView && !isFetching && !isFetchingNextPage && hasNextPage) {
