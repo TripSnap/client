@@ -68,13 +68,15 @@ export default function GroupList() {
             ))}
           </React.Fragment>
         ))}
-        <Grid
-          sx={{
-            position: 'absolute',
-            bottom: 0,
-          }}
-          ref={ref}
-        ></Grid>
+        {!isFetching && !isFetchingNextPage && (
+          <Grid
+            sx={{
+              position: 'absolute',
+              bottom: 0,
+            }}
+            ref={ref}
+          ></Grid>
+        )}
       </Grid>
     </Box>
   )

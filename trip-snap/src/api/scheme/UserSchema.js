@@ -92,4 +92,10 @@ export const loginSchema = object({
     .email('이메일 형식이 올바르지 않습니다.'),
 })
 
+export const searchFriendSchema = object({
+  email: string()
+    .required('이메일이 입력되지 않았습니다.')
+    .email('이메일 형식이 올바르지 않습니다.'),
+})
+
 const memberSchema = object({})

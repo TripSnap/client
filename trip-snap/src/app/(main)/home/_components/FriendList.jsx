@@ -1,5 +1,7 @@
 import {
   Avatar,
+  Button,
+  ButtonGroup,
   Chip,
   Icon,
   IconButton,
@@ -15,6 +17,12 @@ import { useInfiniteQuery } from '@tanstack/react-query'
 import { fetchData } from '@/utils/fetch'
 import { errorAlert } from '@/utils/alertUtil'
 import Grid from '@mui/material/Unstable_Grid2'
+import {
+  allowFriendRequest,
+  cancelFriendRequest,
+  denyFriendRequest,
+  removeFriend,
+} from '@/app/(main)/group/[group-id]/_api/api'
 
 export default function FriendList() {
   const router = useRouter()
@@ -72,9 +80,37 @@ export default function FriendList() {
               divider={true}
               key={friend.email}
               secondaryAction={
-                <IconButton edge="end" aria-label="delete">
-                  <Icon>delete</Icon>
-                </IconButton>
+                friend.isWaiting ? (
+                  <ButtonGroup
+                    variant="outlined"
+                    aria-label="Basic button group"
+                  >
+                    <Button
+                      onClick={async () => {
+                        await allowFriendRequest(friend.email, { router })
+                      }}
+                    >
+                      수락
+                    </Button>
+                    <Button
+                      onClick={async () => {
+                        await denyFriendRequest(friend.email, { router })
+                      }}
+                    >
+                      거절
+                    </Button>
+                  </ButtonGroup>
+                ) : (
+                  <IconButton
+                    edge="end"
+                    aria-label="delete"
+                    onClick={async () => {
+                      await removeFriend(friend.email, { router })
+                    }}
+                  >
+                    <Icon>delete</Icon>
+                  </IconButton>
+                )
               }
             >
               <ListItemAvatar>
@@ -85,7 +121,7 @@ export default function FriendList() {
                   friend.isWaiting ? (
                     <>
                       {friend.nickname}&nbsp;
-                      <Chip label="수락 대기중" size={'small'} />
+                      <Chip label="친구 신청" color="primary" size={'small'} />
                     </>
                   ) : (
                     friend.nickname
@@ -97,13 +133,15 @@ export default function FriendList() {
           ))}
         </React.Fragment>
       ))}
-      <Grid
-        sx={{
-          position: 'absolute',
-          bottom: 0,
-        }}
-        ref={ref}
-      ></Grid>
+      {!isFetching && !isFetchingNextPage && (
+        <Grid
+          sx={{
+            position: 'absolute',
+            bottom: 0,
+          }}
+          ref={ref}
+        ></Grid>
+      )}
     </List>
   )
 }

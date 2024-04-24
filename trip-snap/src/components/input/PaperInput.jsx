@@ -5,6 +5,7 @@ export default function PaperInput({
   placeholder = null,
   control,
   name,
+  appendComponent = null,
   ...props
 }) {
   return (
@@ -36,6 +37,7 @@ export default function PaperInput({
                   {...field}
                   value={field.value || ''}
                 ></InputBase>
+                {appendComponent}
               </Paper>
               {fieldState.error?.message && (
                 <FormHelperText
