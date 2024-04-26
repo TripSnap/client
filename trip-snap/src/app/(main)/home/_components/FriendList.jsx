@@ -36,7 +36,7 @@ export default function FriendList() {
       queryFn: async ({ pageParam }) => {
         try {
           const response = await fetchData('/friend/list', router, {
-            data: { pagePerCnt: 10, page: pageParam },
+            data: { pagePerCnt: 10, page: pageParam, option: 'all' },
           })
           if (response.ok) {
             const { data } = await response.json()

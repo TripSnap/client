@@ -1,91 +1,53 @@
 import CustomDialog from '@/components/dialog/CustomDialog'
-import PaperInput from '@/components/input/PaperInput'
-import {
-  Avatar,
-  Box,
-  Button,
-  Checkbox,
-  Chip,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
-  Paper,
-} from '@mui/material'
+import { Button } from '@mui/material'
+import { useForm } from 'react-hook-form'
+import { GroupInsSchema } from '@/api/scheme/GroupSchema'
+import { useValidationResolver } from '@/api/scheme/useValidationResolver'
+import React from 'react'
+import { AddGroupForm } from '@/app/(main)/home/_components/AddGroupForm'
+import { useThrottle } from '@/hooks/useThrottle'
+import { fetchData } from '@/utils/fetch'
+import { useRouter } from 'next/navigation'
+import { errorAlert, successAlert } from '@/utils/alertUtil'
 
 export default function AddGroupDialog({ isOpen, close }) {
-  const AddForm = () => {
-    return (
-      <>
-        <Box sx={{ mt: 0.5 }}>
-          <h4 style={{ margin: 0 }}>그룹 이름</h4>
-          <PaperInput />
-        </Box>
-        <Box
-          sx={{
-            mt: 2,
-            display: 'flex',
-            flexFlow: 'column',
-          }}
-        >
-          <h4 style={{ margin: 0 }}>친구 선택</h4>
-          <Box
-            sx={{
-              mt: 0.8,
-              overflowX: 'auto',
-              display: 'flex',
-              flexWrap: 'wrap',
-              listStyle: 'none',
-              flexFlow: 'row',
-            }}
-            className="invisible-scrollbar"
-          >
-            {Array.from(Array(13)).map((e, i) => (
-              <Chip
-                key={i}
-                label="Deletable"
-                variant="outlined"
-                onDelete={() => {}}
-                sx={{ mr: 0.5 }}
-              />
-            ))}
-          </Box>
-          <Paper
-            sx={{ overflowY: 'auto', mt: 0.8, height: 400, maxHeight: 400 }}
-          >
-            <List>
-              {Array.from(Array(13)).map((e, i) => (
-                <ListItem
-                  divider={true}
-                  key={i}
-                  secondaryAction={
-                    <Checkbox
-                      edge="end"
-                      // onChange={handleToggle(value)}
-                      // checked={checked.indexOf(value) !== -1}
-                      // inputProps={{ 'aria-labelledby': labelId }}
-                    />
-                  }
-                >
-                  <ListItemAvatar>
-                    <Avatar>A</Avatar>
-                  </ListItemAvatar>
-                  <ListItemText primary="Single-line item" secondary={'s'} />
-                </ListItem>
-              ))}
-            </List>
-          </Paper>
-        </Box>
-      </>
-    )
-  }
+  const router = useRouter()
+  const resolver = useValidationResolver(GroupInsSchema)
+  const { handleSubmit, control, setValue, reset } = useForm({
+    resolver,
+    mode: 'all',
+  })
+
+  const { callback: submit } = useThrottle(2000, async (data) => {
+    const response = await fetchData('/group', router, { method: 'POST', data })
+    if (response.ok) {
+      const data = await response.json()
+      if (data.success) {
+        await successAlert({
+          message: '그룹 생성을 성공했습니다.',
+          callback: () => {
+            reset()
+            close()
+          },
+        })
+      } else {
+        errorAlert({
+          message: '그룹 생성 중 문제가 발생했습니다.',
+        })
+      }
+    }
+  })
+
   return (
     <CustomDialog
       title={'그룹 만들기'}
-      body={<AddForm />}
-      footer={<Button>만들기</Button>}
+      body={<AddGroupForm control={control} setValue={setValue} />}
+      footer={<Button onClick={handleSubmit(submit)}>만들기</Button>}
       isOpen={isOpen}
-      close={close}
+      close={() => {
+        reset()
+        close()
+      }}
     />
   )
 }
