@@ -25,6 +25,7 @@ import {
   allowFriendRequest,
   cancelFriendRequest,
   denyFriendRequest,
+  sendFriendRequest,
 } from '@/app/(main)/group/[group-id]/_api/api'
 
 export default function AddFriendDialog({ isOpen, close }) {
@@ -88,7 +89,17 @@ export default function AddFriendDialog({ isOpen, close }) {
           취소
         </Button>
       )
-    return <Button variant="text">친구 신청</Button>
+
+    return (
+      <Button
+        variant="text"
+        onClick={async () => {
+          await sendFriendRequest(searchUser.email, { router })
+        }}
+      >
+        친구 신청
+      </Button>
+    )
   }
 
   const StateBadge = () => {
@@ -162,6 +173,7 @@ export default function AddFriendDialog({ isOpen, close }) {
       body={<AddForm />}
       isOpen={isOpen}
       close={() => {
+        setSearchUser(null)
         reset()
         close()
       }}
