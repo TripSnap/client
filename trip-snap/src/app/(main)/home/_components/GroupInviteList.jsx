@@ -9,18 +9,18 @@ import { errorAlert } from '@/utils/alertUtil'
 import React from 'react'
 import { useInView } from 'react-intersection-observer'
 
-export default function GroupList() {
+export default function GroupInviteList() {
   const router = useRouter()
   const { ref, inView } = useInView()
   const [fetchEnable, setFetchEnable] = useState(false)
   const { data, isFetching, hasNextPage, fetchNextPage, isFetchingNextPage } =
     useInfiniteQuery({
-      queryKey: ['/group/list', fetchEnable],
+      queryKey: ['/group/invite/list', fetchEnable],
       initialPageParam: 0,
       enabled: fetchEnable,
       queryFn: async ({ pageParam }) => {
         try {
-          const response = await fetchData('/group/list', router, {
+          const response = await fetchData('/group/invite/list', router, {
             data: { pagePerCnt: 20, page: pageParam },
           })
           if (response.ok) {
@@ -63,11 +63,7 @@ export default function GroupList() {
           <React.Fragment key={i}>
             {dataGroup?.map((group) => (
               <Grid key={group.id} xs={12} sm={6} md={4}>
-                <GroupItem
-                  data={group}
-                  router={router}
-                  handleClick={() => router.push(`/group/${group.id}`)}
-                />
+                <GroupItem data={group} router={router} />
               </Grid>
             ))}
           </React.Fragment>

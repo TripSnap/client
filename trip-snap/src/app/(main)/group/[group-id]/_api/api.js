@@ -88,3 +88,31 @@ export const sendFriendRequest = async (email, option = {}) => {
     }
   }
 }
+
+export const allowGroupInvite = async (groupId, option = {}) => {
+  const { router } = option
+  const response = await fetchData(`/group/allow-invite/${groupId}`, router)
+
+  if (response.ok) {
+    const data = await response.json()
+    if (data.success) {
+      successAlert({ message: data.message || '초대를 수락했습니다.' })
+    } else {
+      errorAlert({ message: data.message || '실패했습니다.' })
+    }
+  }
+}
+
+export const denyGroupInvite = async (groupId, option = {}) => {
+  const { router } = option
+  const response = await fetchData(`/group/deny-invite/${groupId}`, router)
+
+  if (response.ok) {
+    const data = await response.json()
+    if (data.success) {
+      successAlert({ message: data.message || '초대를 거절했습니다.' })
+    } else {
+      errorAlert({ message: data.message || '실패했습니다.' })
+    }
+  }
+}
