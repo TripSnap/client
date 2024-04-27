@@ -1,10 +1,6 @@
 import {
   Avatar,
   Button,
-  ButtonGroup,
-  Chip,
-  Icon,
-  IconButton,
   List,
   ListItem,
   ListItemAvatar,
@@ -17,27 +13,26 @@ import { useInfiniteQuery } from '@tanstack/react-query'
 import { fetchData } from '@/utils/fetch'
 import { errorAlert } from '@/utils/alertUtil'
 import Grid from '@mui/material/Unstable_Grid2'
-import {
-  allowFriendRequest,
-  cancelFriendRequest,
-  denyFriendRequest,
-  removeFriend,
-} from '@/app/(main)/group/[group-id]/_api/api'
+import { cancelFriendRequest } from '@/app/(main)/group/[group-id]/_api/api'
 
-export default function FriendList() {
+export default function FriendRequestSendList() {
   const router = useRouter()
   const { ref, inView } = useInView()
   const [fetchEnable, setFetchEnable] = useState(false)
   const { data, isFetching, hasNextPage, fetchNextPage, isFetchingNextPage } =
     useInfiniteQuery({
-      queryKey: ['/friend/list', fetchEnable],
+      queryKey: ['/friend/send-request/list', fetchEnable],
       initialPageParam: 0,
       enabled: fetchEnable,
       queryFn: async ({ pageParam }) => {
         try {
-          const response = await fetchData('/friend/list', router, {
-            data: { pagePerCnt: 10, page: pageParam, option: 'all' },
-          })
+          const response = await fetchData(
+            '/friend/send-request/list',
+            router,
+            {
+              data: { pagePerCnt: 10, page: pageParam },
+            }
+          )
           if (response.ok) {
             const { data } = await response.json()
             return data
@@ -80,53 +75,21 @@ export default function FriendList() {
               divider={true}
               key={friend.email}
               secondaryAction={
-                friend.isWaiting ? (
-                  <ButtonGroup
-                    variant="outlined"
-                    aria-label="Basic button group"
-                  >
-                    <Button
-                      onClick={async () => {
-                        await allowFriendRequest(friend.email, { router })
-                      }}
-                    >
-                      수락
-                    </Button>
-                    <Button
-                      onClick={async () => {
-                        await denyFriendRequest(friend.email, { router })
-                      }}
-                    >
-                      거절
-                    </Button>
-                  </ButtonGroup>
-                ) : (
-                  <IconButton
-                    edge="end"
-                    aria-label="delete"
-                    onClick={async () => {
-                      await removeFriend(friend.email, { router })
-                    }}
-                  >
-                    <Icon>delete</Icon>
-                  </IconButton>
-                )
+                <Button
+                  variant="text"
+                  onClick={async () => {
+                    await cancelFriendRequest(friend.email, { router })
+                  }}
+                >
+                  취소
+                </Button>
               }
             >
               <ListItemAvatar>
                 <Avatar>A</Avatar>
               </ListItemAvatar>
               <ListItemText
-                primary={
-                  friend.isWaiting ? (
-                    <>
-                      {friend.nickname}&nbsp;
-                      <Chip label="친구 신청" color="primary" size={'small'} />
-                    </>
-                  ) : (
-                    friend.nickname
-                  )
-                }
+                primary={friend.nickname}
                 secondary={friend.email}
               />
             </ListItem>

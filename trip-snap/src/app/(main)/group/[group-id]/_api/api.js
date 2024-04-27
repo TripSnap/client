@@ -34,10 +34,9 @@ export const denyFriendRequest = async (email, option = {}) => {
 }
 
 export const cancelFriendRequest = async (email, option = {}) => {
-  new Error('API 안만들어졌음..')
   const { router } = option
-  const response = await fetchData('/friend', router, {
-    method: 'GET',
+  const response = await fetchData('/friend/send-request/remove', router, {
+    method: 'POST',
     data: { email },
   })
 
