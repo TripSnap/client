@@ -20,8 +20,7 @@ export default function Map({
   const initMap = ({ lat, lng } = {}) => {
     setMap(
       new kakao.maps.Map(container.current, {
-        // center: new kakao.maps.LatLng(lat ?? 37.5664056, lng ?? 126.9778222),
-        center: new kakao.maps.LatLng(37.56646, 126.97761),
+        center: new kakao.maps.LatLng(lat ?? 37.5664056, lng ?? 126.9778222),
         level: 3,
         mapTypeId: kakao.maps.MapTypeId.ROADMAP,
         tileAnimation: false,
