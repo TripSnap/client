@@ -1,5 +1,5 @@
 import { Box, Breadcrumbs, Link, Typography } from '@mui/material'
-import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 
 /**
  *
@@ -7,13 +7,18 @@ import { useEffect } from 'react'
  */
 
 export default function CusotmBreadcrumbs({ data }) {
-  useEffect(() => {}, [])
+  const router = useRouter()
   return (
     <Box sx={{ m: 1, display: 'inline-block' }}>
       <Breadcrumbs aria-label="breadcrumb">
         {data.length > 1 &&
           data.slice(0, -1).map(({ path, name }, i) => (
-            <Link key={i} underline="hover" color="inherit" to={path}>
+            <Link
+              key={i}
+              underline="hover"
+              color="inherit"
+              onClick={() => router.replace(path)}
+            >
               {name}
             </Link>
           ))}

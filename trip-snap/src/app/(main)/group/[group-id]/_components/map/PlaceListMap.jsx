@@ -105,15 +105,18 @@ export default function PlaceListMap({ isSmallerThanMd }) {
       )}
 
       {/* <MemberListDrawer /> */}
-      <AlbumDetailDialog
-        isOpen={openDetailModal}
-        close={() => setOpenDetailModal(false)}
-      />
-      <AddAlbumDialog
-        isOpen={openAddModal}
-        // isOpen={true}
-        close={() => setOpenAddModal(false)}
-      />
+      {openDetailModal && (
+        <AlbumDetailDialog
+          isOpen={openDetailModal}
+          close={() => setOpenDetailModal(false)}
+        />
+      )}
+      {openAddModal && (
+        <AddAlbumDialog
+          isOpen={openAddModal}
+          close={() => setOpenAddModal(false)}
+        />
+      )}
     </>
   )
 }

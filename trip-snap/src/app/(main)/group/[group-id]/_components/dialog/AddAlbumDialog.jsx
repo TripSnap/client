@@ -10,13 +10,15 @@ import { useThrottle } from '@/hooks/useThrottle'
 import { fetchData } from '@/utils/fetch'
 import { useRouter } from 'next/navigation'
 import { errorAlert, successAlert } from '@/utils/alertUtil'
+import { useGroupContext } from '@/app/(main)/group/[group-id]/_context/GroupContext'
 
 export default function AddAlbumDialog({ isOpen, close }) {
   const router = useRouter()
   const resolver = useValidationResolver(AlbumInsSchema)
+  const { groupId } = useGroupContext()
   const instance = useForm({
     resolver: resolver,
-    defaultValues: { date: dayjs(), groupId: 1 },
+    defaultValues: { date: dayjs(), groupId },
   })
 
   const { callback: submit } = useThrottle(2000, async (value) => {
@@ -30,7 +32,6 @@ export default function AddAlbumDialog({ isOpen, close }) {
         successAlert({
           message: '기록이 생성되었습니다.',
           callback: () => {
-            instance.reset()
             close()
           },
         })
@@ -53,13 +54,7 @@ export default function AddAlbumDialog({ isOpen, close }) {
           <AlbumPhotoForm />
         </>
       }
-      footer={
-        <Button
-          onClick={instance.handleSubmit(submit)}
-        >
-          올리기
-        </Button>
-      }
+      footer={<Button onClick={instance.handleSubmit(submit)}>올리기</Button>}
     />
   )
 }
