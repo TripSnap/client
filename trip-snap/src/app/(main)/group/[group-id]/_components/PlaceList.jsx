@@ -36,7 +36,7 @@ export default function PlaceList({ openModal, list, focusPlace }) {
         try {
           const response = await fetchData('/album/list', router, {
             method: 'POST',
-            data: { pagePerCnt: 1, page: pageParam, groupId },
+            data: { pagePerCnt: 10, page: pageParam, groupId },
           })
           if (response.ok) {
             const { data } = await response.json()
