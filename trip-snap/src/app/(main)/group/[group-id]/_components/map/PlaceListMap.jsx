@@ -25,18 +25,6 @@ export default function PlaceListMap({ isSmallerThanMd }) {
     setOpenDetailModal,
   } = usePlaceListContext()
 
-  useEffect(() => {
-    setPlaceList(
-      Array(10)
-        .fill(0)
-        .map((e, i) => ({
-          lat: 37.56646 + i / 2000,
-          lng: 126.97761 + i / 2000,
-          id: i + 1,
-        }))
-    )
-  }, [])
-
   return (
     <>
       <Grid container>
@@ -64,7 +52,7 @@ export default function PlaceListMap({ isSmallerThanMd }) {
                 : { height: '100%' }),
             }}
           >
-            <Map usePlaceMarker />
+            <Map useAlbumPlaceMarker />
             <Fab
               color="primary"
               aria-label="add"
@@ -95,7 +83,7 @@ export default function PlaceListMap({ isSmallerThanMd }) {
         )}
       </Grid>
       {isSmallerThanMd && (
-        <BottomHandleDrawer title={'51 results'}>
+        <BottomHandleDrawer title={'places'}>
           <PlaceList
             list={placeList}
             openModal={() => setOpenDetailModal(true)}

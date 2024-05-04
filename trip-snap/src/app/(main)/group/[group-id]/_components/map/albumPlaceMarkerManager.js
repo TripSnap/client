@@ -3,9 +3,7 @@ import { renderToString } from 'react-dom/server'
 import Marker from './Marker'
 import { usePlaceListContext } from './PlaceListProvider'
 
-// TODO: 클릭 이벤트 -> selected 활성화
-// TODO: selected만 활성화 시키는 경우도 추가해야함 (PlaceList secondary button)
-export default function placeMarkerManager({ map }) {
+export default function albumPlaceMarkerManager({ map }) {
   const { placeList, selected, setSelected, setOpenDetailModal } =
     usePlaceListContext()
   const [markers, setMarkers] = useState([])
@@ -18,22 +16,24 @@ export default function placeMarkerManager({ map }) {
   }, [placeList, map])
 
   useEffect(() => {
-    markers.forEach(({ marker, dom }) => {
-      setMarker(marker, dom, false)
-    })
-    if (selected) {
-      const [{ marker, dom, data }] = markers.filter(
-        ({ data }) => data.id == selected
-      )
-      setMarker(marker, dom, true)
-      map.panTo(new kakao.maps.LatLng(data.lat, data.lng))
+    if (map && markers.length) {
+      markers.forEach(({ marker, dom }) => {
+        setMarker(marker, dom, false)
+      })
+      if (selected) {
+        const [{ marker, dom, data }] = markers.filter(
+          ({ data }) => data.id == selected
+        )
+        setMarker(marker, dom, true)
+        map.panTo(new kakao.maps.LatLng(data.lat, data.lng))
+      }
     }
-  }, [selected])
+  }, [selected, map])
 
   const createMarker = (data) => {
     const { lat, lng, photo, id } = data
     const dom = document.createElement('div')
-    dom.innerHTML = renderToString(<Marker />)
+    dom.innerHTML = renderToString(<Marker selected={id == selected} />)
 
     const marker = new kakao.maps.CustomOverlay({
       map: map,

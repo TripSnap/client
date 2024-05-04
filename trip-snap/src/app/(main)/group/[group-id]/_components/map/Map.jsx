@@ -1,19 +1,18 @@
 import { LocationSearching } from '@mui/icons-material'
 import { Button, ButtonGroup } from '@mui/material'
 import { useEffect, useRef, useState } from 'react'
-import placeMarkerManager from './placeMarkerManager'
+import albumPlaceMarkerManager from './albumPlaceMarkerManager'
 import locationMarkerManager from './locationMarkerManager'
 
-// TODO: props 위도 경도 받기..
 export default function Map({
-  usePlaceMarker,
+  useAlbumPlaceMarker,
   useMarker,
   setAddress,
   setLatLng,
 }) {
   const container = useRef(null)
   const [map, setMap] = useState(null)
-  const placeMarker = usePlaceMarker && placeMarkerManager({ map })
+  const placeMarker = useAlbumPlaceMarker && albumPlaceMarkerManager({ map })
   const locationMarker =
     useMarker && locationMarkerManager({ map, setAddress, setLatLng })
 

@@ -22,6 +22,7 @@ import Grid from '@mui/material/Unstable_Grid2'
 export const AddGroupForm = ({ control, setValue }) => {
   const router = useRouter()
 
+  const { ref, inView } = useInView()
   const [fetchEnable, setFetchEnable] = useState(true)
   const [emails, setEmails] = useState([])
   const { data, isFetching, hasNextPage, fetchNextPage, isFetchingNextPage } =
@@ -60,7 +61,6 @@ export const AddGroupForm = ({ control, setValue }) => {
   useEffect(() => {
     setValue('memberEmails', emails)
   }, [emails])
-  const { ref, inView } = useInView()
 
   useEffect(() => {
     if (inView && !isFetching && !isFetchingNextPage && hasNextPage) {
