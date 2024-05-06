@@ -1,8 +1,4 @@
-import {
-  fetchRefreshToken,
-  getAccessToken,
-  removeToken,
-} from '@/utils/AuthUtil'
+import { fetchRefreshToken, removeToken } from '@/utils/AuthUtil'
 import { errorAlert } from '@/utils/alertUtil'
 
 export const fetchData = async (url, router, option = {}) => {
@@ -11,13 +7,6 @@ export const fetchData = async (url, router, option = {}) => {
     method: method.toUpperCase(),
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
-  }
-
-  if (getAccessToken()) {
-    fetchOption.headers = {
-      ...fetchOption.headers,
-      Authorization: `Bearer ${getAccessToken()}`,
-    }
   }
 
   let fetchUrl = process.env.NEXT_PUBLIC_API_URL + url

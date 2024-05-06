@@ -10,7 +10,7 @@ import { useForm } from 'react-hook-form'
 import { useThrottle } from '@/hooks/useThrottle'
 import { fetchData } from '@/utils/fetch'
 import { errorAlert } from '@/utils/alertUtil'
-import { setAccessToken, setRefreshToken } from '@/utils/AuthUtil'
+import { setRefreshToken } from '@/utils/AuthUtil'
 
 export default function Page() {
   const router = useRouter()
@@ -25,11 +25,7 @@ export default function Page() {
       data: value,
     })
     if (response.ok) {
-      const accessToken = response.headers.get('Authorization')
       const refreshToken = response.headers.get('Refresh-Token')
-      if (!!accessToken) {
-        setAccessToken(accessToken)
-      }
       if (!!refreshToken) {
         setRefreshToken(refreshToken)
       }
