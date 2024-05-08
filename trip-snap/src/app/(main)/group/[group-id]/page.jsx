@@ -1,11 +1,9 @@
 import GroupPageComponent from '@/app/(main)/group/[group-id]/GroupPageComponent'
-import { cookies } from 'next/headers'
 import { serverFetchData } from '@/utils/server-fetch'
 
 const getGroupData = async (groupId) => {
-  const response = await serverFetchData(`/group/${groupId}`, {
-    cookie: cookies().toString(),
-  })
+  const response = await serverFetchData(`/group/${groupId}`)
+
   if (response.ok) {
     return await response.json()
   } else {
