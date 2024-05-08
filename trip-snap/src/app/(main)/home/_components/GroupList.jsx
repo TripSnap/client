@@ -3,14 +3,13 @@ import Grid from '@mui/material/Unstable_Grid2'
 import GroupItem from './GroupItem'
 import { useRouter } from 'next/navigation'
 import { useInfiniteQuery } from '@tanstack/react-query'
-import { fetchData } from '@/utils/fetch'
-import { useEffect, useState } from 'react'
-import { errorAlert } from '@/utils/alertUtil'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useInView } from 'react-intersection-observer'
+import useFetch from '@/hooks/useFetch'
 
 export default function GroupList() {
   const router = useRouter()
+  const { fetch } = useFetch(router)
   const { ref, inView } = useInView()
   const [fetchEnable, setFetchEnable] = useState(false)
   const { data, isFetching, hasNextPage, fetchNextPage, isFetchingNextPage } =
@@ -20,7 +19,7 @@ export default function GroupList() {
       enabled: fetchEnable,
       queryFn: async ({ pageParam }) => {
         try {
-          const response = await fetchData('/group/list', router, {
+          const response = await fetch('/group/list', {
             data: { pagePerCnt: 20, page: pageParam },
           })
           if (response.ok) {

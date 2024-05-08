@@ -12,8 +12,10 @@ import {
   denyGroupInvite,
 } from '@/app/(main)/group/[group-id]/_api/api'
 import React from 'react'
+import useFetch from '@/hooks/useFetch'
 
 export default function GroupItem({ data, router, handleClick }) {
+  const { fetch } = useFetch(router)
   const CardArea = ({ children }) => {
     return handleClick ? (
       <CardActionArea onClick={handleClick}>{children}</CardActionArea>
@@ -53,14 +55,14 @@ export default function GroupItem({ data, router, handleClick }) {
                   >
                     <Button
                       onClick={async () => {
-                        await allowGroupInvite(data.id, { router })
+                        await allowGroupInvite(fetch, data.id)
                       }}
                     >
                       수락
                     </Button>
                     <Button
                       onClick={async () => {
-                        await denyGroupInvite(data.id, { router })
+                        await denyGroupInvite(fetch, data.id)
                       }}
                     >
                       거절

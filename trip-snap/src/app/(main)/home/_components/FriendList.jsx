@@ -14,18 +14,18 @@ import { useRouter } from 'next/navigation'
 import { useInView } from 'react-intersection-observer'
 import React, { useEffect, useState } from 'react'
 import { useInfiniteQuery } from '@tanstack/react-query'
-import { fetchData } from '@/utils/fetch'
 import { errorAlert } from '@/utils/alertUtil'
 import Grid from '@mui/material/Unstable_Grid2'
 import {
   allowFriendRequest,
-  cancelFriendRequest,
   denyFriendRequest,
   removeFriend,
 } from '@/app/(main)/group/[group-id]/_api/api'
+import useFetch from '@/hooks/useFetch'
 
 export default function FriendList() {
   const router = useRouter()
+  const { fetch } = useFetch(router)
   const { ref, inView } = useInView()
   const [fetchEnable, setFetchEnable] = useState(false)
   const { data, isFetching, hasNextPage, fetchNextPage, isFetchingNextPage } =
@@ -35,7 +35,7 @@ export default function FriendList() {
       enabled: fetchEnable,
       queryFn: async ({ pageParam }) => {
         try {
-          const response = await fetchData('/friend/list', router, {
+          const response = await fetch('/friend/list', {
             data: { pagePerCnt: 10, page: pageParam, option: 'all' },
           })
           if (response.ok) {
@@ -87,14 +87,14 @@ export default function FriendList() {
                   >
                     <Button
                       onClick={async () => {
-                        await allowFriendRequest(friend.email, { router })
+                        await allowFriendRequest(friend.email, fetch)
                       }}
                     >
                       수락
                     </Button>
                     <Button
                       onClick={async () => {
-                        await denyFriendRequest(friend.email, { router })
+                        await denyFriendRequest(friend.email, fetch)
                       }}
                     >
                       거절
@@ -105,7 +105,7 @@ export default function FriendList() {
                     edge="end"
                     aria-label="delete"
                     onClick={async () => {
-                      await removeFriend(friend.email, { router })
+                      await removeFriend(friend.email, fetch)
                     }}
                   >
                     <Icon>delete</Icon>

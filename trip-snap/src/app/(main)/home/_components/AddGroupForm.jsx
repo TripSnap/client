@@ -13,15 +13,15 @@ import InputLabel from '@/components/input/InputLabel'
 import PaperInput from '@/components/input/PaperInput'
 import React, { useEffect, useState } from 'react'
 import { useInfiniteQuery } from '@tanstack/react-query'
-import { fetchData } from '@/utils/fetch'
 import { errorAlert } from '@/utils/alertUtil'
 import { useRouter } from 'next/navigation'
 import { useInView } from 'react-intersection-observer'
 import Grid from '@mui/material/Unstable_Grid2'
+import useFetch from '@/hooks/useFetch'
 
 export const AddGroupForm = ({ control, setValue }) => {
   const router = useRouter()
-
+  const { fetch } = useFetch(router)
   const { ref, inView } = useInView()
   const [fetchEnable, setFetchEnable] = useState(true)
   const [emails, setEmails] = useState([])
@@ -32,7 +32,7 @@ export const AddGroupForm = ({ control, setValue }) => {
       enabled: fetchEnable,
       queryFn: async ({ pageParam }) => {
         try {
-          const response = await fetchData('/friend/list', router, {
+          const response = await fetch('/friend/list', {
             data: { pagePerCnt: 10, page: pageParam, option: 'active' },
           })
           if (response.ok) {

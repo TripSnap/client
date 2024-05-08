@@ -7,13 +7,14 @@ import { AlbumInsSchema } from '@/api/scheme/GroupSchema'
 import { useForm } from 'react-hook-form'
 import dayjs from 'dayjs'
 import { useThrottle } from '@/hooks/useThrottle'
-import { fetchData } from '@/utils/fetch'
 import { useRouter } from 'next/navigation'
 import { errorAlert, successAlert } from '@/utils/alertUtil'
 import { useGroupContext } from '@/app/(main)/group/[group-id]/_context/GroupContext'
+import useFetch from '@/hooks/useFetch'
 
 export default function AddAlbumDialog({ isOpen, close }) {
   const router = useRouter()
+  const { fetch } = useFetch(router)
   const resolver = useValidationResolver(AlbumInsSchema)
   const { groupId } = useGroupContext()
   const instance = useForm({
@@ -22,7 +23,7 @@ export default function AddAlbumDialog({ isOpen, close }) {
   })
 
   const { callback: submit } = useThrottle(2000, async (value) => {
-    const response = await fetchData('/album', router, {
+    const response = await fetch('/album', {
       method: 'POST',
       data: { ...value, data: dayjs(value.data).format('yyyy-MM-dd HH:mm:ss') },
     })

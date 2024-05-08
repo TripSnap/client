@@ -18,7 +18,6 @@ import { searchFriendSchema } from '@/api/scheme/UserSchema'
 import { useForm } from 'react-hook-form'
 import PaperInput from '@/components/input/PaperInput'
 import { useThrottle } from '@/hooks/useThrottle'
-import { fetchData } from '@/utils/fetch'
 import { errorAlert } from '@/utils/alertUtil'
 import { useState } from 'react'
 import {
@@ -27,9 +26,11 @@ import {
   denyFriendRequest,
   sendFriendRequest,
 } from '@/app/(main)/group/[group-id]/_api/api'
+import useFetch from '@/hooks/useFetch'
 
 export default function AddFriendDialog({ isOpen, close }) {
   const router = useRouter()
+  const { fetch } = useFetch(router)
   const resolver = useValidationResolver(searchFriendSchema)
   const { handleSubmit, control, reset } = useForm({
     resolver,
@@ -39,7 +40,7 @@ export default function AddFriendDialog({ isOpen, close }) {
   const [searchUser, setSearchUser] = useState(null)
 
   const { callback: search } = useThrottle(2000, async (value) => {
-    const response = await fetchData('/friend/search', router, {
+    const response = await fetch('/friend/search', {
       method: 'POST',
       data: value,
     })
@@ -64,14 +65,14 @@ export default function AddFriendDialog({ isOpen, close }) {
         <ButtonGroup variant="outlined" aria-label="Basic button group">
           <Button
             onClick={async () => {
-              await allowFriendRequest(searchUser.email, { router })
+              await allowFriendRequest(fetch, searchUser.email)
             }}
           >
             수락
           </Button>
           <Button
             onClick={async () => {
-              await denyFriendRequest(searchUser.email, { router })
+              await denyFriendRequest(fetch, searchUser.email)
             }}
           >
             거절
@@ -83,7 +84,7 @@ export default function AddFriendDialog({ isOpen, close }) {
         <Button
           variant="text"
           onClick={async () => {
-            await cancelFriendRequest(searchUser.email, { router })
+            await cancelFriendRequest(fetch, searchUser.email)
           }}
         >
           취소
@@ -94,7 +95,7 @@ export default function AddFriendDialog({ isOpen, close }) {
       <Button
         variant="text"
         onClick={async () => {
-          await sendFriendRequest(searchUser.email, { router })
+          await sendFriendRequest(fetch, searchUser.email)
         }}
       >
         친구 신청

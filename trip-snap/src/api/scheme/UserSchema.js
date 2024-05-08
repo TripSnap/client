@@ -1,5 +1,5 @@
 import { boolean, object, string } from 'yup'
-import { pureFetchData } from '@/utils/fetch'
+import { fetchData } from '@/utils/fetch'
 import { debounceAsync } from '@/utils/utils'
 
 const Regexp = Object.freeze({
@@ -12,7 +12,7 @@ export const joinSchema = object({
     .email('이메일 형식이 올바르지 않습니다.')
     .test({
       test: debounceAsync(2000, async (value, context) => {
-        const response = await pureFetchData('/join/check-email', {
+        const response = await fetchData('/join/check-email', {
           method: 'POST',
           data: { email: value },
         })

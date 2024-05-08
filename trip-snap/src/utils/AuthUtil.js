@@ -18,5 +18,7 @@ export const fetchRefreshToken = async () => {
       grant_type: 'refresh_token',
       token: getRefreshToken(),
     }),
+    credentials: 'include',
   })
+  return response.ok
 }

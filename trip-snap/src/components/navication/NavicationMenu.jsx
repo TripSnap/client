@@ -23,7 +23,7 @@ export default function NavicationMenu() {
   }
 
   const logout = async () => {
-    const response = await fetchData('/logout', router, {
+    const response = await fetchData('/logout', {
       method: 'GET',
     })
     removeToken()

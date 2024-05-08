@@ -1,9 +1,7 @@
-import { fetchData } from '@/utils/fetch'
 import { confirmAlert, errorAlert, successAlert } from '@/utils/alertUtil'
 
-export const allowFriendRequest = async (email, option = {}) => {
-  const { router } = option
-  const response = await fetchData('/friend/allow-request', router, {
+export const allowFriendRequest = async (fetch, email) => {
+  const response = await fetch('/friend/allow-request', {
     method: 'POST',
     data: { email },
   })
@@ -17,9 +15,8 @@ export const allowFriendRequest = async (email, option = {}) => {
   }
 }
 
-export const denyFriendRequest = async (email, option = {}) => {
-  const { router } = option
-  const response = await fetchData('/friend/deny-request', router, {
+export const denyFriendRequest = async (fetch, email) => {
+  const response = await fetch('/friend/deny-request', {
     method: 'POST',
     data: { email },
   })
@@ -33,9 +30,8 @@ export const denyFriendRequest = async (email, option = {}) => {
   }
 }
 
-export const cancelFriendRequest = async (email, option = {}) => {
-  const { router } = option
-  const response = await fetchData('/friend/send-request/remove', router, {
+export const cancelFriendRequest = async (fetch, email) => {
+  const response = await fetch('/friend/send-request/remove', router, {
     method: 'POST',
     data: { email },
   })
@@ -50,12 +46,11 @@ export const cancelFriendRequest = async (email, option = {}) => {
   }
 }
 
-export const removeFriend = async (email, option = {}) => {
-  const { router } = option
+export const removeFriend = async (fetch, email) => {
   await confirmAlert({
     message: '정말로 삭제하시겠습니까?',
     confirmCallback: async () => {
-      const response = await fetchData('/friend/remove', router, {
+      const response = await fetch('/friend/remove', router, {
         method: 'POST',
         data: { email },
       })
@@ -72,9 +67,8 @@ export const removeFriend = async (email, option = {}) => {
   })
 }
 
-export const sendFriendRequest = async (email, option = {}) => {
-  const { router } = option
-  const response = await fetchData('/friend/send-request', router, {
+export const sendFriendRequest = async (fetch, email) => {
+  const response = await fetch('/friend/send-request', router, {
     method: 'POST',
     data: { email },
   })
@@ -89,9 +83,8 @@ export const sendFriendRequest = async (email, option = {}) => {
   }
 }
 
-export const allowGroupInvite = async (groupId, option = {}) => {
-  const { router } = option
-  const response = await fetchData(`/group/allow-invite/${groupId}`, router)
+export const allowGroupInvite = async (fetch, groupId) => {
+  const response = await fetch(`/group/allow-invite/${groupId}`, router)
 
   if (response.ok) {
     const data = await response.json()
@@ -103,9 +96,8 @@ export const allowGroupInvite = async (groupId, option = {}) => {
   }
 }
 
-export const denyGroupInvite = async (groupId, option = {}) => {
-  const { router } = option
-  const response = await fetchData(`/group/deny-invite/${groupId}`, router)
+export const denyGroupInvite = async (fetch, groupId) => {
+  const response = await fetch(`/group/deny-invite/${groupId}`, router)
 
   if (response.ok) {
     const data = await response.json()

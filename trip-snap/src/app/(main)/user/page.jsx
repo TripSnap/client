@@ -4,7 +4,6 @@ import PaperInput from '@/components/input/PaperInput'
 import { Avatar, Box, Button, Divider, Paper } from '@mui/material'
 import Grid from '@mui/material/Unstable_Grid2'
 import { useRouter } from 'next/navigation'
-import { fetchData } from '@/utils/fetch'
 import { useValidationResolver } from '@/api/scheme/useValidationResolver'
 import {
   updateMemberDataSchema,
@@ -14,10 +13,11 @@ import { useForm, useFormState } from 'react-hook-form'
 import InputLabel from '@/components/input/InputLabel'
 import { useThrottle } from '@/hooks/useThrottle'
 import { errorAlert, successAlert } from '@/utils/alertUtil'
+import useFetch from '@/hooks/useFetch'
 
 export default function Page() {
   const router = useRouter()
-
+  const { fetch } = useFetch(router)
   const userDataResolver = useValidationResolver(
     updateMemberDataSchema.noUnknown()
   )
@@ -30,7 +30,7 @@ export default function Page() {
     mode: 'all',
     defaultValues: async () => {
       try {
-        const response = await fetchData('/account/user', router)
+        const response = await fetch('/account/user')
         if (response.ok) {
           const { data } = await response.json()
           return {
@@ -66,7 +66,7 @@ export default function Page() {
         }
       }
       if (Object.keys(body).length > 0) {
-        const response = await fetchData('/account/user', router, {
+        const response = await fetch('/account/user', {
           method: 'PATCH',
           data: body,
         })
@@ -88,7 +88,7 @@ export default function Page() {
   )
   const { callback: userPasswordSubmit } = useThrottle(2000, async (data) => {
     const { password, newPassword } = data
-    const response = await fetchData('/account/user/password', router, {
+    const response = await fetch('/account/user/password', {
       method: 'PATCH',
       data: { password, newPassword },
     })

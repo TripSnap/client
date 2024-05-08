@@ -6,12 +6,13 @@ import { useValidationResolver } from '@/api/scheme/useValidationResolver'
 import React from 'react'
 import { AddGroupForm } from '@/app/(main)/home/_components/AddGroupForm'
 import { useThrottle } from '@/hooks/useThrottle'
-import { fetchData } from '@/utils/fetch'
 import { useRouter } from 'next/navigation'
 import { errorAlert, successAlert } from '@/utils/alertUtil'
+import useFetch from '@/hooks/useFetch'
 
 export default function AddGroupDialog({ isOpen, close }) {
   const router = useRouter()
+  const { fetch } = useFetch(router)
   const resolver = useValidationResolver(GroupInsSchema)
   const { handleSubmit, control, setValue, reset } = useForm({
     resolver,
@@ -19,7 +20,7 @@ export default function AddGroupDialog({ isOpen, close }) {
   })
 
   const { callback: submit } = useThrottle(2000, async (data) => {
-    const response = await fetchData('/group', router, { method: 'POST', data })
+    const response = await fetch('/group', { method: 'POST', data })
     if (response.ok) {
       const data = await response.json()
       if (data.success) {

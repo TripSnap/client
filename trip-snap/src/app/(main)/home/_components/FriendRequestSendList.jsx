@@ -10,13 +10,14 @@ import { useRouter } from 'next/navigation'
 import { useInView } from 'react-intersection-observer'
 import React, { useEffect, useState } from 'react'
 import { useInfiniteQuery } from '@tanstack/react-query'
-import { fetchData } from '@/utils/fetch'
 import { errorAlert } from '@/utils/alertUtil'
 import Grid from '@mui/material/Unstable_Grid2'
 import { cancelFriendRequest } from '@/app/(main)/group/[group-id]/_api/api'
+import useFetch from '@/hooks/useFetch'
 
 export default function FriendRequestSendList() {
   const router = useRouter()
+  const { fetch } = useFetch(router)
   const { ref, inView } = useInView()
   const [fetchEnable, setFetchEnable] = useState(false)
   const { data, isFetching, hasNextPage, fetchNextPage, isFetchingNextPage } =
@@ -26,13 +27,9 @@ export default function FriendRequestSendList() {
       enabled: fetchEnable,
       queryFn: async ({ pageParam }) => {
         try {
-          const response = await fetchData(
-            '/friend/send-request/list',
-            router,
-            {
-              data: { pagePerCnt: 10, page: pageParam },
-            }
-          )
+          const response = await fetch('/friend/send-request/list', {
+            data: { pagePerCnt: 10, page: pageParam },
+          })
           if (response.ok) {
             const { data } = await response.json()
             return data
@@ -78,7 +75,7 @@ export default function FriendRequestSendList() {
                 <Button
                   variant="text"
                   onClick={async () => {
-                    await cancelFriendRequest(friend.email, { router })
+                    await cancelFriendRequest(fetch, friend.email)
                   }}
                 >
                   취소

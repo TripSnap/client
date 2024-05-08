@@ -9,7 +9,6 @@ import {
 } from '@mui/material'
 import { useGroupContext } from '@/app/(main)/group/[group-id]/_context/GroupContext'
 import { useInfiniteQuery } from '@tanstack/react-query'
-import { fetchData } from '@/utils/fetch'
 import { errorAlert } from '@/utils/alertUtil'
 import { useInView } from 'react-intersection-observer'
 import React, { useEffect, useState } from 'react'
@@ -17,10 +16,12 @@ import { useRouter } from 'next/navigation'
 import Grid from '@mui/material/Unstable_Grid2'
 import { usePlaceListContext } from '@/app/(main)/group/[group-id]/_components/map/PlaceListProvider'
 import { usePreviousValue } from '@/hooks/usePreviousValue'
+import useFetch from '@/hooks/useFetch'
 
 export default function PlaceList({ openModal, list, focusPlace }) {
   const { setAlbumId, groupId } = useGroupContext()
   const router = useRouter()
+  const { fetch } = useFetch(router)
   const { ref, inView } = useInView()
   const [fetchEnable, setFetchEnable] = useState(true)
 
@@ -31,10 +32,10 @@ export default function PlaceList({ openModal, list, focusPlace }) {
     useInfiniteQuery({
       queryKey: ['/album/list', 'POST', groupId],
       initialPageParam: 0,
-      enabled: fetchEnable,
+      enabled: fetchEnable && !!groupId,
       queryFn: async ({ pageParam }) => {
         try {
-          const response = await fetchData('/album/list', router, {
+          const response = await fetch('/album/list', {
             method: 'POST',
             data: { pagePerCnt: 10, page: pageParam, groupId },
           })
