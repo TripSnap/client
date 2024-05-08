@@ -12,7 +12,8 @@ export default function Map({
 }) {
   const container = useRef(null)
   const [map, setMap] = useState(null)
-  const placeMarker = useAlbumPlaceMarker && albumPlaceMarkerManager({ map })
+  const albumPlaceMarker =
+    useAlbumPlaceMarker && albumPlaceMarkerManager({ map })
   const locationMarker =
     useMarker && locationMarkerManager({ map, setAddress, setLatLng })
 
@@ -64,7 +65,8 @@ export default function Map({
     try {
       const { lat, lng } = await getCurrentPosition()
       map.setCenter(new kakao.maps.LatLng(lat, lng))
-      locationMarker && locationMarker.setMarker({ lat, lng })
+      useMarker && locationMarker.setMarker({ lat, lng })
+      useAlbumPlaceMarker && albumPlaceMarker.clearSelected()
     } catch (e) {
       // 위치정보를 불러올수 없으요
     }

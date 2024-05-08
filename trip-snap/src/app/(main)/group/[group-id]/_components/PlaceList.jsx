@@ -74,7 +74,8 @@ export default function PlaceList({ openModal, list, focusPlace }) {
       setPlaceList(
         pages
           .flatMap((e) => e)
-          .map(({ id, latitude, longitude }) => ({
+          .filter((e) => !!e)
+          .map(({ id, latitude, longitude, title, date, address }) => ({
             id,
             lat: latitude,
             lng: longitude,
@@ -106,6 +107,7 @@ export default function PlaceList({ openModal, list, focusPlace }) {
                   onClick={(e) => {
                     e.stopPropagation()
                     focusPlace(album.id)
+                    setAlbumId(album.id)
                   }}
                 >
                   <LocationSearchingIcon />

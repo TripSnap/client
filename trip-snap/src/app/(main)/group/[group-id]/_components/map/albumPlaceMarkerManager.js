@@ -64,5 +64,5 @@ export default function albumPlaceMarkerManager({ map }) {
     marker.setMap(null)
   }
 
-  return {}
+  return { clearSelected: () => setSelected(null) }
 }
