@@ -79,6 +79,9 @@ export default function PlaceList({ openModal, list, focusPlace }) {
             id,
             lat: latitude,
             lng: longitude,
+            title,
+            date,
+            address,
           }))
       )
     }
