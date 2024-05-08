@@ -5,6 +5,8 @@ import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
 import './root.css'
 import ReactQueryProviders from '@/context/ReactQueryProvider'
+import { GroupContext } from '@/app/(main)/group/[group-id]/_context/GroupContext'
+import React from 'react'
 
 export const metadata = {
   title: 'TripSnap',
@@ -22,7 +24,9 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body style={{ margin: 0 }}>
-        <ReactQueryProviders>{children}</ReactQueryProviders>
+        <ReactQueryProviders>
+          <GroupContext>{children}</GroupContext>
+        </ReactQueryProviders>
 
         <script
           src={`//dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.KAKAO_MAP_KEY}&libraries=services,drawing`}
