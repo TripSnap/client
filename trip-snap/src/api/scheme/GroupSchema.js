@@ -12,6 +12,17 @@ export const PhotoSchema = object({
   albumPhotoList: array(object({ photo: string().required() })).ensure(),
 })
 
+export const AddPhotoSchema = object({
+  groupId: number().required(),
+  albumId: number().required(),
+}).concat(PhotoSchema)
+
+export const RemovePhotoSchema = object({
+  groupId: number().required(),
+  albumId: number().required(),
+  removePhotoIds: array(number()).min(1).ensure(),
+})
+
 export const AlbumInsSchema = object({
   groupId: number().required(),
   title: string().required('기록 이름이 입력되지 않았습니다.'),

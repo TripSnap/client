@@ -1,8 +1,6 @@
 import {
-  Checkbox,
   ImageList,
   ImageListItem,
-  ImageListItemBar,
   useMediaQuery,
   useTheme,
 } from '@mui/material'
@@ -10,7 +8,7 @@ import React from 'react'
 import Grid from '@mui/material/Unstable_Grid2'
 
 const SquareImageList = React.forwardRef(
-  ({ list, isFetching = false, useCheckbox = false }, ref) => {
+  ({ list, isFetching = false }, ref) => {
     const theme = useTheme()
     const isSmallerThanSm = useMediaQuery(theme.breakpoints.down('sm'))
     return (
@@ -30,12 +28,6 @@ const SquareImageList = React.forwardRef(
             }}
           >
             <img src={photo} />
-
-            {useCheckbox && (
-              <ImageListItemBar
-                actionIcon={<Checkbox size="small" sx={{ p: '5px' }} />}
-              />
-            )}
           </ImageListItem>
         ))}
         {!isFetching && (

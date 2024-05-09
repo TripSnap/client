@@ -46,7 +46,7 @@ export default function GroupPageComponent({ group }) {
       <Paper sx={isSmallerThanMd ? {} : { margin: '19px' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <CusotmBreadcrumbs
-            data={[{ name: '그룹 목록', path: '/home' }, { name: '그룹 이름' }]}
+            data={[{ name: '그룹 목록', path: '/home' }, { name: group.title }]}
           />
           <IconButton onClick={handleClick}>
             <MoreVert />
@@ -67,9 +67,8 @@ export default function GroupPageComponent({ group }) {
           }}
           onClose={handleClose}
         >
-          <MenuItem>Profile</MenuItem>
-          <MenuItem>My account</MenuItem>
-          <MenuItem>Logout</MenuItem>
+          <MenuItem>인원 목록</MenuItem>
+          <MenuItem>그룹 탈퇴</MenuItem>
         </Menu>
         <Divider />
         <PlaceListProvider>

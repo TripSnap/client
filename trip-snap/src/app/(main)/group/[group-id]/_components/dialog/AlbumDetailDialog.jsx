@@ -150,14 +150,18 @@ export default function AlbumDetailDialog({ isOpen, close }) {
           }
         />
       )}
-      <AddAlbumPhotoDialog
-        isOpen={openAddModal}
-        close={() => setOpenAddModal(false)}
-      />
-      <EditAlbumPhotoDialog
-        isOpen={openEditModal}
-        close={() => setOpenEditModal(false)}
-      />
+      {openAddModal && (
+        <AddAlbumPhotoDialog
+          isOpen={openAddModal}
+          close={() => setOpenAddModal(false)}
+        />
+      )}
+      {openEditModal && (
+        <EditAlbumPhotoDialog
+          isOpen={openEditModal}
+          close={() => setOpenEditModal(false)}
+        />
+      )}
     </>
   )
 }
