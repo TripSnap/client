@@ -3,7 +3,7 @@ import Swal from 'sweetalert2'
 const alert = async (option = {}) => {
   const { message, button, icon, callback } = option
   await Swal.fire({
-    text: message,
+    html: message,
     icon,
     showCancelButton: false,
     showConfirmButton: button,
@@ -21,7 +21,7 @@ export const confirmAlert = async (option = {}) => {
   const { message, confirmCallback, cancelCallback, confirmText, cancelText } =
     option
   const result = await Swal.fire({
-    text: message,
+    html: message,
     icon: 'info',
     showCancelButton: true,
     cancelButtonText: cancelText || '아니오',

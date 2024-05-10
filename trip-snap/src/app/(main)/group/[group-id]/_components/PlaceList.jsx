@@ -75,14 +75,17 @@ export default function PlaceList({ openModal, list, focusPlace }) {
         pages
           .flatMap((e) => e)
           .filter((e) => !!e)
-          .map(({ id, latitude, longitude, title, date, address }) => ({
-            id,
-            lat: latitude,
-            lng: longitude,
-            title,
-            date,
-            address,
-          }))
+          .map(
+            ({ id, latitude, longitude, title, date, address, isOwner }) => ({
+              id,
+              isOwner,
+              lat: latitude,
+              lng: longitude,
+              title,
+              date,
+              address,
+            })
+          )
       )
     }
   }, [data])

@@ -16,10 +16,11 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import { usePlaceListContext } from '@/app/(main)/group/[group-id]/_components/map/PlaceListProvider'
 import { useGroupContext } from '@/app/(main)/group/[group-id]/_context/GroupContext'
 import { useInfiniteQuery } from '@tanstack/react-query'
-import { errorAlert } from '@/utils/alertUtil'
+import { confirmAlert, errorAlert, successAlert } from '@/utils/alertUtil'
 import { useInView } from 'react-intersection-observer'
 import useFetch from '@/hooks/useFetch'
 import { useRouter } from 'next/navigation'
+import { debounce } from '@/utils/utils'
 
 export default function AlbumDetailDialog({ isOpen, close }) {
   const { placeList } = usePlaceListContext()
@@ -80,6 +81,24 @@ export default function AlbumDetailDialog({ isOpen, close }) {
     }
   }, [inView, isFetching, isFetchingNextPage, hasNextPage])
 
+  const removeAlbum = debounce(1000, async () => {
+    await confirmAlert({
+      message: `정말로 삭제하시겠습니까?<br/>앨범 내 모든 사진이 삭제됩니다.`,
+      confirmCallback: async () => {
+        const response = await fetch('/album/remove', {
+          method: 'POST',
+          data: { groupId, albumId },
+        })
+        if (response.ok) {
+          const { success } = await response.json()
+          if (success) {
+            successAlert({ message: '삭제되었습니다.', callback: close })
+          }
+        }
+      },
+    })
+  })
+
   return (
     <>
       {albumData && (
@@ -139,12 +158,14 @@ export default function AlbumDetailDialog({ isOpen, close }) {
                   tooltipOpen
                   onClick={() => setOpenEditModal(true)}
                 />
-                <SpeedDialAction
-                  icon={<DeleteIcon color="error" />}
-                  tooltipTitle={'기록삭제'}
-                  tooltipOpen
-                  onClick={() => setOpenAddModal(true)}
-                />
+                {albumData?.isOwner && (
+                  <SpeedDialAction
+                    icon={<DeleteIcon color="error" />}
+                    tooltipTitle={'기록삭제'}
+                    tooltipOpen
+                    onClick={removeAlbum}
+                  />
+                )}
               </SpeedDial>
             </>
           }
