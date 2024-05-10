@@ -8,13 +8,13 @@ import { fetchData } from '@/utils/fetch'
 
 export default function Error({ error, reset }) {
   const router = useRouter()
-  const alert = () => {
+  const alert = () =>
     errorAlert({
       message: error,
       button: true,
       callback: () => router.replace('/'),
     })
-  }
+
   useEffect(() => {
     const func = async () => {
       try {
@@ -29,11 +29,17 @@ export default function Error({ error, reset }) {
             removeToken()
             router.replace('/login')
           }
+        } else if (type === 'BearerError') {
+          await fetchData('/logout', {
+            method: 'GET',
+          })
+          removeToken()
+          router.replace('/login')
         } else {
-          alert()
+          await alert()
         }
       } catch (e) {
-        alert()
+        await alert()
       }
     }
     func()

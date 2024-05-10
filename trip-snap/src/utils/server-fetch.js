@@ -1,8 +1,7 @@
 import 'server-only'
 import { fetchData } from '@/utils/fetch'
 import { cookies, headers } from 'next/headers'
-import { errorAlert } from '@/utils/alertUtil'
-import { throwAuthenticationError } from '@/errors'
+import { throwAuthenticationError, throwBearerError } from '@/errors'
 
 export const serverFetchData = async (url, option = {}) => {
   try {
@@ -18,11 +17,13 @@ export const serverFetchData = async (url, option = {}) => {
         const pathname = heads.get('next-url')
         throwAuthenticationError(pathname)
       }
+      if (requiredAuthenticateHeader === 'Bearer') {
+        throwBearerError()
+      }
     }
     return response
   } catch (e) {
-    if (e.name === 'AuthenticationError') throw e
-    else await errorAlert({ message: '에러가 발생했습니다.' })
+    if (['AuthenticationError', 'BearerError'].includes(e.name)) throw e
     return Response.error()
   }
 }
