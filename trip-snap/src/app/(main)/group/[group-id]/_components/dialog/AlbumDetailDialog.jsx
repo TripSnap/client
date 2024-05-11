@@ -134,7 +134,7 @@ export default function AlbumDetailDialog({ isOpen, close }) {
             </>
           }
           body={
-            <>
+            <Box sx={{ minHeight: '400px' }}>
               <SquareImageList
                 list={data?.pages?.flatMap((e) => e).filter((e) => !!e) || []}
                 ref={ref}
@@ -167,7 +167,7 @@ export default function AlbumDetailDialog({ isOpen, close }) {
                   />
                 )}
               </SpeedDial>
-            </>
+            </Box>
           }
         />
       )}

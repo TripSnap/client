@@ -17,11 +17,14 @@ import PlaceListMap from '@/app/(main)/group/[group-id]/_components/map/PlaceLis
 import { PlaceListProvider } from '@/app/(main)/group/[group-id]/_components/map/PlaceListProvider'
 import { useGroupContext } from '@/app/(main)/group/[group-id]/_context/GroupContext'
 import { useRouter } from 'next/navigation'
+import { confirmAlert, successAlert } from '@/utils/alertUtil'
+import useFetch from '@/hooks/useFetch'
 
 export default function GroupPageComponent({ group }) {
   const theme = useTheme()
   const isSmallerThanMd = useMediaQuery(theme.breakpoints.down('md'))
   const router = useRouter()
+  const { fetch } = useFetch(router)
 
   const [anchorEl, setAnchorEl] = useState(null)
   const menuOpen = Boolean(anchorEl)
@@ -41,6 +44,24 @@ export default function GroupPageComponent({ group }) {
       router.replace('/')
     }
   }, [])
+
+  const leaveGroup = () =>
+    confirmAlert({
+      message: '그룹을 탈퇴하시겠습니까?',
+      confirmCallback: async () => {
+        const response = await fetch(`/group/leave/${groupId}`)
+        if (response.ok) {
+          const { success } = await response.json()
+          if (success) {
+            await successAlert({
+              message: '그룹을 탈퇴했습니다.',
+              callback: () => router.replace('/home'),
+            })
+          }
+        }
+      },
+    })
+
   return (
     <>
       <Paper sx={isSmallerThanMd ? {} : { margin: '19px' }}>
@@ -68,7 +89,7 @@ export default function GroupPageComponent({ group }) {
           onClose={handleClose}
         >
           <MenuItem>인원 목록</MenuItem>
-          <MenuItem>그룹 탈퇴</MenuItem>
+          <MenuItem onClick={leaveGroup}>그룹 탈퇴</MenuItem>
         </Menu>
         <Divider />
         <PlaceListProvider>
