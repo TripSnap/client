@@ -4,16 +4,19 @@ import { useNotiContext } from '@/context/NotificationContext'
 import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined'
 import { Avatar, Badge, Fab, Menu, MenuItem } from '@mui/material'
 import Grid from '@mui/material/Unstable_Grid2'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { fetchData } from '@/utils/fetch'
 import { removeToken } from '@/utils/AuthUtil'
+import useFetch from '@/hooks/useFetch'
 
 export default function NavicationMenu() {
   const { open } = useNotiContext()
   const [anchorEl, setAnchorEl] = useState(null)
   const menuOpen = Boolean(anchorEl)
   const router = useRouter()
+  const [invisibleBadge, setInvisibleBadge] = useState(true)
+  const { fetch } = useFetch(router)
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget)
@@ -30,6 +33,25 @@ export default function NavicationMenu() {
     router.replace('/login')
   }
 
+  useEffect(() => {
+    const init = async () => {
+      const response = await fetch('/notification/check-new')
+      if (response.ok) {
+        const {
+          data: { existed },
+        } = await response.json()
+        setInvisibleBadge(!existed)
+      }
+    }
+    init()
+  }, [])
+
+  useEffect(() => {
+    if (open) {
+      setInvisibleBadge(true)
+    }
+  }, [open])
+
   return (
     <>
       <Grid ml={'auto'} display={'flex'} flexGrow={'row'} alignItems={'center'}>
@@ -41,7 +63,7 @@ export default function NavicationMenu() {
               vertical: 'top',
               horizontal: 'right',
             }}
-            invisible={false}
+            invisible={invisibleBadge}
           >
             <NotificationsNoneOutlinedIcon />
           </Badge>
