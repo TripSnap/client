@@ -19,6 +19,7 @@ import { useGroupContext } from '@/app/(main)/group/[group-id]/_context/GroupCon
 import { useRouter } from 'next/navigation'
 import { confirmAlert, successAlert } from '@/utils/alertUtil'
 import useFetch from '@/hooks/useFetch'
+import MemberDrawer from '@/app/(main)/group/[group-id]/_components/MemberDrawer'
 
 export default function GroupPageComponent({ group }) {
   const theme = useTheme()
@@ -28,6 +29,9 @@ export default function GroupPageComponent({ group }) {
 
   const [anchorEl, setAnchorEl] = useState(null)
   const menuOpen = Boolean(anchorEl)
+
+  const [memberDrawerIsOpen, setMemberDrawerIsOpen] = useState(false)
+
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget)
   }
@@ -88,7 +92,9 @@ export default function GroupPageComponent({ group }) {
           }}
           onClose={handleClose}
         >
-          <MenuItem>인원 목록</MenuItem>
+          <MenuItem onClick={() => setMemberDrawerIsOpen(true)}>
+            인원 목록
+          </MenuItem>
           <MenuItem onClick={leaveGroup}>그룹 탈퇴</MenuItem>
         </Menu>
         <Divider />
@@ -99,6 +105,10 @@ export default function GroupPageComponent({ group }) {
         {/* {} */}
         {/* <EditAlbumPhotoDialog /> */}
       </Paper>
+      <MemberDrawer
+        isOpen={memberDrawerIsOpen}
+        close={() => setMemberDrawerIsOpen(false)}
+      />
     </>
   )
 }
