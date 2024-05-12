@@ -79,6 +79,13 @@ export default function NotiDrawer() {
     const response = await fetch(`/notification/${id}`, { method: 'DELETE' })
   }
 
+  useEffect(() => {
+    if (!isOpen) {
+      setAnchorEl(null)
+      setAlarmDetailId(null)
+    }
+  }, [isOpen])
+
   return (
     <Drawer open={isOpen} onClose={close} anchor={'right'}>
       <List disablePadding={true}>
