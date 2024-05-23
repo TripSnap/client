@@ -30,9 +30,9 @@ export const confirmAlert = async (option = {}) => {
     showCloseButton: false,
   })
   if (result.isConfirmed) {
-    confirmCallback && confirmCallback()
+    confirmCallback && (await confirmCallback())
   }
   if (result.dismiss === Swal.DismissReason.cancel) {
-    cancelCallback && cancelCallback()
+    cancelCallback && (await cancelCallback())
   }
 }
