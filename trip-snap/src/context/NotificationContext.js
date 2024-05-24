@@ -5,7 +5,7 @@ import { createContext, useContext, useEffect, useState } from 'react'
 const NotiContext = createContext(false)
 
 const NotiProvider = ({ children }) => {
-  const [notiOpen, setNotiopen] = useState()
+  const [notiOpen, setNotiopen] = useState(false)
 
   useEffect(() => {
     setBodyScroll(notiOpen)

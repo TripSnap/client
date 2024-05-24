@@ -1,5 +1,5 @@
 import { boolean, object, string } from 'yup'
-import { pureFetchData } from '@/utils/fetch'
+import { fetchData } from '@/utils/fetch'
 import { debounceAsync } from '@/utils/utils'
 
 const Regexp = Object.freeze({
@@ -12,9 +12,9 @@ export const joinSchema = object({
     .email('이메일 형식이 올바르지 않습니다.')
     .test({
       test: debounceAsync(2000, async (value, context) => {
-        const response = await pureFetchData('/join/check-email', {
+        const response = await fetchData('/join/check-email', {
           method: 'POST',
-          body: { email: value },
+          data: { email: value },
         })
         if (response.ok) {
           const data = await response.json()
@@ -87,6 +87,12 @@ export const updatePasswordSchema = object({
 
 export const loginSchema = object({
   password: string().required('비밀번호가 입력되지 않았습니다.'),
+  email: string()
+    .required('이메일이 입력되지 않았습니다.')
+    .email('이메일 형식이 올바르지 않습니다.'),
+})
+
+export const searchFriendSchema = object({
   email: string()
     .required('이메일이 입력되지 않았습니다.')
     .email('이메일 형식이 올바르지 않습니다.'),

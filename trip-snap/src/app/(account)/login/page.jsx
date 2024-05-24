@@ -8,28 +8,25 @@ import { useValidationResolver } from '@/api/scheme/useValidationResolver'
 import { loginSchema } from '@/api/scheme/UserSchema'
 import { useForm } from 'react-hook-form'
 import { useThrottle } from '@/hooks/useThrottle'
-import { fetchData } from '@/utils/fetch'
 import { errorAlert } from '@/utils/alertUtil'
-import { setAccessToken, setRefreshToken } from '@/utils/AuthUtil'
+import { setRefreshToken } from '@/utils/AuthUtil'
+import useFetch from '@/hooks/useFetch'
 
 export default function Page() {
   const router = useRouter()
+  const { fetch } = useFetch(router)
   const resolver = useValidationResolver(loginSchema)
   const { handleSubmit, control, setValue, watch } = useForm({
     resolver,
     mode: 'onChange',
   })
   const { callback: submit } = useThrottle(2000, async (value) => {
-    const response = await fetchData('/login', router, {
+    const response = await fetch('/login', {
       method: 'POST',
-      body: value,
+      data: value,
     })
     if (response.ok) {
-      const accessToken = response.headers.get('Authorization')
       const refreshToken = response.headers.get('Refresh-Token')
-      if (!!accessToken) {
-        setAccessToken(accessToken)
-      }
       if (!!refreshToken) {
         setRefreshToken(refreshToken)
       }

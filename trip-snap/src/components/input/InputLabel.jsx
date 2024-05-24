@@ -1,4 +1,4 @@
-export default function InputLabel({ name, required, level }) {
+export default function InputLabel({ name, required, level, bold }) {
   const Tag = ({ children, ...props }) => {
     switch (level) {
       case 2:
@@ -10,7 +10,7 @@ export default function InputLabel({ name, required, level }) {
     }
   }
   return (
-    <Tag style={{ margin: 0, fontWeight: 500 }}>
+    <Tag style={{ margin: 0, ...(bold ? {} : { fontWeight: 500 }) }}>
       {name}
       {required && <span style={{ color: 'red' }}>&nbsp;*</span>}
     </Tag>

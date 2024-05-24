@@ -1,6 +1,6 @@
 import { Image } from '@mui/icons-material'
 import { Box, Button, Paper } from '@mui/material'
-import SquareImageList from './SquareImageList'
+import EditableSquareImageList from '@/app/(main)/group/[group-id]/_components/EditableSquareImageList'
 
 export default function AlbumPhotoForm() {
   return (
@@ -10,7 +10,7 @@ export default function AlbumPhotoForm() {
           사진 추가
         </Button>
         <Paper sx={{ mt: 0.5, p: 0.5 }}>
-          <SquareImageList />
+          <EditableSquareImageList />
         </Paper>
       </Box>
     </>

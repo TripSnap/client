@@ -20,7 +20,7 @@ export default function locationMarkerManager({ map, setAddress, setLatLng }) {
 
   const setMarker = ({ lat, lng }) => {
     getAddressByLatlng({ lat, lng })
-    setLatLng([lat, lng])
+    setLatLng({ lat, lng })
     if (marker.current) {
       marker.current.setMap(null)
     }

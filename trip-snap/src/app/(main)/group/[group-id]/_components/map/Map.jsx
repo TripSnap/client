@@ -1,27 +1,26 @@
-import { LocationSearching, Search } from '@mui/icons-material'
+import { LocationSearching } from '@mui/icons-material'
 import { Button, ButtonGroup } from '@mui/material'
 import { useEffect, useRef, useState } from 'react'
-import placeMarkerManager from './placeMarkerManager'
+import albumPlaceMarkerManager from './albumPlaceMarkerManager'
 import locationMarkerManager from './locationMarkerManager'
 
-// TODO: props 위도 경도 받기..
 export default function Map({
-  usePlaceMarker,
+  useAlbumPlaceMarker,
   useMarker,
   setAddress,
   setLatLng,
 }) {
   const container = useRef(null)
   const [map, setMap] = useState(null)
-  const placeMarker = usePlaceMarker && placeMarkerManager({ map })
+  const albumPlaceMarker =
+    useAlbumPlaceMarker && albumPlaceMarkerManager({ map })
   const locationMarker =
     useMarker && locationMarkerManager({ map, setAddress, setLatLng })
 
   const initMap = ({ lat, lng } = {}) => {
     setMap(
       new kakao.maps.Map(container.current, {
-        // center: new kakao.maps.LatLng(lat ?? 37.5664056, lng ?? 126.9778222),
-        center: new kakao.maps.LatLng(37.56646, 126.97761),
+        center: new kakao.maps.LatLng(lat ?? 37.5664056, lng ?? 126.9778222),
         level: 3,
         mapTypeId: kakao.maps.MapTypeId.ROADMAP,
         tileAnimation: false,
@@ -66,7 +65,8 @@ export default function Map({
     try {
       const { lat, lng } = await getCurrentPosition()
       map.setCenter(new kakao.maps.LatLng(lat, lng))
-      locationMarker && locationMarker.setMarker({ lat, lng })
+      useMarker && locationMarker.setMarker({ lat, lng })
+      useAlbumPlaceMarker && albumPlaceMarker.clearSelected()
     } catch (e) {
       // 위치정보를 불러올수 없으요
     }

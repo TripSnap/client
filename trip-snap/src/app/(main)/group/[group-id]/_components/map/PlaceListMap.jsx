@@ -25,18 +25,6 @@ export default function PlaceListMap({ isSmallerThanMd }) {
     setOpenDetailModal,
   } = usePlaceListContext()
 
-  useEffect(() => {
-    setPlaceList(
-      Array(10)
-        .fill(0)
-        .map((e, i) => ({
-          lat: 37.56646 + i / 2000,
-          lng: 126.97761 + i / 2000,
-          id: i + 1,
-        }))
-    )
-  }, [])
-
   return (
     <>
       <Grid container>
@@ -64,7 +52,7 @@ export default function PlaceListMap({ isSmallerThanMd }) {
                 : { height: '100%' }),
             }}
           >
-            <Map usePlaceMarker />
+            <Map useAlbumPlaceMarker />
             <Fab
               color="primary"
               aria-label="add"
@@ -86,7 +74,7 @@ export default function PlaceListMap({ isSmallerThanMd }) {
           >
             <Box overflow={'auto'} maxHeight={'calc(100vh - 150px)'}>
               <PlaceList
-                list={placeList}
+                modalIsOpen={openAddModal || openDetailModal}
                 openModal={() => setOpenDetailModal(true)}
                 focusPlace={(id) => setSelected(id)}
               />
@@ -95,9 +83,9 @@ export default function PlaceListMap({ isSmallerThanMd }) {
         )}
       </Grid>
       {isSmallerThanMd && (
-        <BottomHandleDrawer title={'51 results'}>
+        <BottomHandleDrawer title={'places'}>
           <PlaceList
-            list={placeList}
+            modalIsOpen={openAddModal || openDetailModal}
             openModal={() => setOpenDetailModal(true)}
             focusPlace={(id) => setSelected(id)}
           />
@@ -105,15 +93,18 @@ export default function PlaceListMap({ isSmallerThanMd }) {
       )}
 
       {/* <MemberListDrawer /> */}
-      <AlbumDetailDialog
-        isOpen={openDetailModal}
-        close={() => setOpenDetailModal(false)}
-      />
-      <AddAlbumDialog
-        isOpen={openAddModal}
-        // isOpen={true}
-        close={() => setOpenAddModal(false)}
-      />
+      {openDetailModal && (
+        <AlbumDetailDialog
+          isOpen={openDetailModal}
+          close={() => setOpenDetailModal(false)}
+        />
+      )}
+      {openAddModal && (
+        <AddAlbumDialog
+          isOpen={openAddModal}
+          close={() => setOpenAddModal(false)}
+        />
+      )}
     </>
   )
 }

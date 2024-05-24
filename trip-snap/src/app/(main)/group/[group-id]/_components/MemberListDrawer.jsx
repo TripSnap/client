@@ -4,8 +4,6 @@ import {
   Avatar,
   Button,
   Drawer,
-  Icon,
-  IconButton,
   List,
   ListItem,
   ListItemAvatar,

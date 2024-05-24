@@ -1,6 +1,5 @@
 import PaperInput from '@/components/input/PaperInput'
 import { Box, Paper, styled, useMediaQuery, useTheme } from '@mui/material'
-import { useEffect, useState } from 'react'
 import Map from './map/Map'
 import dayjs from 'dayjs'
 import {
@@ -9,16 +8,13 @@ import {
   MobileDateTimePicker,
 } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import InputLabel from '@/components/input/InputLabel'
 
 const MarginBox = styled(Box)(({ theme }) => ({
   marginTop: '0.5rem',
 }))
 
-export default function AlbumForm() {
-  const [address, setAddress] = useState('')
-  const [latLng, setLatLng] = useState([])
-  const [date, setDate] = useState(dayjs())
-
+export default function AlbumForm({ control, watch, setValue }) {
   const theme = useTheme()
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'))
 
@@ -26,26 +22,36 @@ export default function AlbumForm() {
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Box>
         <MarginBox>
-          <h4 style={{ margin: 0 }}>그룹 이름</h4>
-          <PaperInput />
+          <InputLabel bold name={'기록 이름'} level={4} />
+          <PaperInput control={control} name={'title'} />
         </MarginBox>
         <MarginBox>
-          <h4 style={{ margin: 0 }}>날짜</h4>
+          <InputLabel bold name={'날짜'} level={4} />
           <Paper sx={{ display: 'inline-block' }}>
             {fullScreen && (
-              <MobileDateTimePicker value={date} onChange={setDate} />
+              <MobileDateTimePicker
+                value={watch('date')}
+                onChange={(value) => {
+                  setValue('date', dayjs(value))
+                }}
+                format={'YYYY/MM/DD HH:mm '}
+                disableFuture
+              />
             )}
             {!fullScreen && (
               <DateTimePicker
-                value={date}
-                onChange={setDate}
+                value={watch('date')}
+                onChange={(value) => {
+                  setValue('date', dayjs(value))
+                }}
                 format={'YYYY/MM/DD HH:mm '}
+                disableFuture
               />
             )}
           </Paper>
         </MarginBox>
         <MarginBox>
-          <h4 style={{ margin: 0 }}>위치</h4>
+          <InputLabel bold name={'위치'} level={4} />
           <Paper
             sx={{
               p: '2px 4px 2px 10px',
@@ -55,12 +61,21 @@ export default function AlbumForm() {
               height: '300px',
             }}
           >
-            <Map useMarker setAddress={setAddress} setLatLng={setLatLng} />
+            <Map
+              useMarker
+              setAddress={(address) => {
+                setValue('address', address)
+              }}
+              setLatLng={({ lat, lng }) => {
+                setValue('latitude', lat)
+                setValue('longitude', lng)
+              }}
+            />
           </Paper>
         </MarginBox>
         <MarginBox>
-          <h4 style={{ margin: 0 }}>주소</h4>
-          <PaperInput value={address} readOnly></PaperInput>
+          <InputLabel bold name={'주소'} level={4} />
+          <PaperInput control={control} name={'address'} readOnly></PaperInput>
         </MarginBox>
       </Box>
     </LocalizationProvider>
