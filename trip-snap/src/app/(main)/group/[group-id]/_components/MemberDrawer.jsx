@@ -67,7 +67,10 @@ export default function MemberDrawer({ isOpen, close }) {
         if (response.ok) {
           const { success } = await response.json()
           if (success) {
-            successAlert({ message: '취소했습니다.' ,callback: () => removePage(email)})
+            successAlert({
+              message: '취소했습니다.',
+              callback: () => removePage(email),
+            })
           }
         }
       },

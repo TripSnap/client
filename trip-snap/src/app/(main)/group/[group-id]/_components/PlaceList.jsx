@@ -29,34 +29,30 @@ export default function PlaceList({ openModal, focusPlace, modalIsOpen }) {
     usePlaceListContext()
   const prevPlaceList = usePreviousValue(placeList)
 
-  const {
-    data,
-    enableNextFetch,
-    fetchNextPage,
-    refetchLastPage,
-  } = useListFetch({
-    queryKey: ['/album/list', groupId, 'POST'],
-    queryFn: async ({ pageParam }) => {
-      try {
-        const response = await fetch('/album/list', {
-          method: 'POST',
-          data: { pagePerCnt: 10, page: pageParam, groupId },
-        })
-        if (response.ok) {
-          const { data } = await response.json()
-          return data
-        } else {
+  const { data, enableNextFetch, fetchNextPage, refetchLastPage } =
+    useListFetch({
+      queryKey: ['/album/list', groupId, 'POST'],
+      queryFn: async ({ pageParam }) => {
+        try {
+          const response = await fetch('/album/list', {
+            method: 'POST',
+            data: { pagePerCnt: 10, page: pageParam, groupId },
+          })
+          if (response.ok) {
+            const { data } = await response.json()
+            return data
+          } else {
+            setFetchEnable(false)
+            errorAlert({ message: '데이터를 가져오는 데 실패했습니다.' })
+          }
+        } catch (e) {
           setFetchEnable(false)
-          errorAlert({ message: '데이터를 가져오는 데 실패했습니다.' })
         }
-      } catch (e) {
-        setFetchEnable(false)
-      }
-    },
-    fetchEnable: fetchEnable && !!groupId,
-    pageSize: 10,
-    key: 'id',
-  })
+      },
+      fetchEnable: fetchEnable && !!groupId,
+      pageSize: 10,
+      key: 'id',
+    })
 
   useEffect(() => {
     if (inView && enableNextFetch) {
