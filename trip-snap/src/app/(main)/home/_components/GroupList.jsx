@@ -2,21 +2,21 @@ import { Box } from '@mui/material'
 import Grid from '@mui/material/Unstable_Grid2'
 import GroupItem from './GroupItem'
 import { useRouter } from 'next/navigation'
-import { useInfiniteQuery } from '@tanstack/react-query'
 import React, { useEffect, useState } from 'react'
 import { useInView } from 'react-intersection-observer'
 import useFetch from '@/hooks/useFetch'
+import useListFetch from '@/hooks/useListFetch'
+import { errorAlert } from '@/utils/alertUtil'
 
-export default function GroupList() {
+export default function GroupList({ modalIsOpen }) {
   const router = useRouter()
   const { fetch } = useFetch(router)
   const { ref, inView } = useInView()
   const [fetchEnable, setFetchEnable] = useState(false)
-  const { data, isFetching, hasNextPage, fetchNextPage, isFetchingNextPage } =
-    useInfiniteQuery({
-      queryKey: ['/group/list', fetchEnable],
-      initialPageParam: 0,
-      enabled: fetchEnable,
+
+  const { data, enableNextFetch, fetchNextPage, reset, removeLastPage } =
+    useListFetch({
+      queryKey: ['/group/list', 'GET'],
       queryFn: async ({ pageParam }) => {
         try {
           const response = await fetch('/group/list', {
@@ -33,28 +33,28 @@ export default function GroupList() {
           setFetchEnable(false)
         }
       },
-      getNextPageParam: (lastPage, allPages, lastPageParam) => {
-        if (!lastPage) return 0
-        if (!!lastPage.length) {
-          return lastPageParam + 1
-        } else {
-          return undefined
-        }
-      },
-      getPreviousPageParam: (firstPage, allPages, firstPageParam) =>
-        !!firstPageParam ? firstPageParam + 1 : undefined,
+      fetchEnable,
+      pageSize: 20,
+      key: 'id',
     })
 
   useEffect(() => {
     setFetchEnable(true)
-    return () => setFetchEnable(false)
+    return () => reset()
   }, [])
 
   useEffect(() => {
-    if (inView && !isFetching && !isFetchingNextPage && hasNextPage) {
+    if (inView && enableNextFetch) {
       fetchNextPage()
     }
-  }, [inView, isFetching, isFetchingNextPage, hasNextPage])
+  }, [inView, enableNextFetch])
+
+  useEffect(() => {
+    if (!modalIsOpen && data) {
+      removeLastPage()
+    }
+  }, [modalIsOpen])
+
   return (
     <Box>
       <Grid container spacing={1} sx={{ position: 'relative' }}>
@@ -71,7 +71,7 @@ export default function GroupList() {
             ))}
           </React.Fragment>
         ))}
-        {!isFetching && !isFetchingNextPage && (
+        {enableNextFetch && (
           <Grid
             sx={{
               position: 'absolute',

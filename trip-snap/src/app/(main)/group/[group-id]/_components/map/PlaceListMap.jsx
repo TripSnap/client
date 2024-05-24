@@ -74,7 +74,7 @@ export default function PlaceListMap({ isSmallerThanMd }) {
           >
             <Box overflow={'auto'} maxHeight={'calc(100vh - 150px)'}>
               <PlaceList
-                list={placeList}
+                modalIsOpen={openAddModal || openDetailModal}
                 openModal={() => setOpenDetailModal(true)}
                 focusPlace={(id) => setSelected(id)}
               />
@@ -85,7 +85,7 @@ export default function PlaceListMap({ isSmallerThanMd }) {
       {isSmallerThanMd && (
         <BottomHandleDrawer title={'places'}>
           <PlaceList
-            list={placeList}
+            modalIsOpen={openAddModal || openDetailModal}
             openModal={() => setOpenDetailModal(true)}
             focusPlace={(id) => setSelected(id)}
           />

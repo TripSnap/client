@@ -8,7 +8,6 @@ import {
   ListItemText,
 } from '@mui/material'
 import { useGroupContext } from '@/app/(main)/group/[group-id]/_context/GroupContext'
-import { useInfiniteQuery } from '@tanstack/react-query'
 import { errorAlert } from '@/utils/alertUtil'
 import { useInView } from 'react-intersection-observer'
 import React, { useEffect, useState } from 'react'
@@ -17,8 +16,9 @@ import Grid from '@mui/material/Unstable_Grid2'
 import { usePlaceListContext } from '@/app/(main)/group/[group-id]/_components/map/PlaceListProvider'
 import { usePreviousValue } from '@/hooks/usePreviousValue'
 import useFetch from '@/hooks/useFetch'
+import useListFetch from '@/hooks/useListFetch'
 
-export default function PlaceList({ openModal, list, focusPlace }) {
+export default function PlaceList({ openModal, focusPlace, modalIsOpen }) {
   const { setAlbumId, groupId } = useGroupContext()
   const router = useRouter()
   const { fetch } = useFetch(router)
@@ -28,45 +28,41 @@ export default function PlaceList({ openModal, list, focusPlace }) {
   const { placeList, setPlaceList, selected, setSelected } =
     usePlaceListContext()
   const prevPlaceList = usePreviousValue(placeList)
-  const { data, isFetching, hasNextPage, fetchNextPage, isFetchingNextPage } =
-    useInfiniteQuery({
-      queryKey: ['/album/list', 'POST', groupId],
-      initialPageParam: 0,
-      enabled: fetchEnable && !!groupId,
-      queryFn: async ({ pageParam }) => {
-        try {
-          const response = await fetch('/album/list', {
-            method: 'POST',
-            data: { pagePerCnt: 10, page: pageParam, groupId },
-          })
-          if (response.ok) {
-            const { data } = await response.json()
-            return data
-          } else {
-            setFetchEnable(false)
-            errorAlert({ message: '데이터를 가져오는 데 실패했습니다.' })
-          }
-        } catch (e) {
-          setFetchEnable(false)
-        }
-      },
-      getNextPageParam: (lastPage, allPages, lastPageParam) => {
-        if (!lastPage) return 0
-        if (!!lastPage.length) {
-          return lastPageParam + 1
+
+  const {
+    data,
+    enableNextFetch,
+    fetchNextPage,
+    refetchLastPage,
+  } = useListFetch({
+    queryKey: ['/album/list', groupId, 'POST'],
+    queryFn: async ({ pageParam }) => {
+      try {
+        const response = await fetch('/album/list', {
+          method: 'POST',
+          data: { pagePerCnt: 10, page: pageParam, groupId },
+        })
+        if (response.ok) {
+          const { data } = await response.json()
+          return data
         } else {
-          return undefined
+          setFetchEnable(false)
+          errorAlert({ message: '데이터를 가져오는 데 실패했습니다.' })
         }
-      },
-      getPreviousPageParam: (firstPage, allPages, firstPageParam) =>
-        !!firstPageParam ? firstPageParam + 1 : undefined,
-    })
+      } catch (e) {
+        setFetchEnable(false)
+      }
+    },
+    fetchEnable: fetchEnable && !!groupId,
+    pageSize: 10,
+    key: 'id',
+  })
 
   useEffect(() => {
-    if (inView && !isFetching && !isFetchingNextPage && hasNextPage) {
+    if (inView && enableNextFetch) {
       fetchNextPage()
     }
-  }, [inView, isFetching, isFetchingNextPage, hasNextPage])
+  }, [inView, enableNextFetch])
 
   useEffect(() => {
     if (data) {
@@ -96,6 +92,12 @@ export default function PlaceList({ openModal, list, focusPlace }) {
       setSelected(lastPlaceList.id)
     }
   }, [placeList])
+
+  useEffect(() => {
+    if (!modalIsOpen && data) {
+      refetchLastPage()
+    }
+  }, [modalIsOpen])
 
   return (
     <List>
@@ -136,7 +138,7 @@ export default function PlaceList({ openModal, list, focusPlace }) {
           ))}
         </React.Fragment>
       ))}
-      {!isFetching && !isFetchingNextPage && (
+      {enableNextFetch && (
         <Grid
           sx={{
             position: 'absolute',

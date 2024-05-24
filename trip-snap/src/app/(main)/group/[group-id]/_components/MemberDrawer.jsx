@@ -14,9 +14,9 @@ import Grid from '@mui/material/Unstable_Grid2'
 import { useRouter } from 'next/navigation'
 import useFetch from '@/hooks/useFetch'
 import { useInView } from 'react-intersection-observer'
-import { useInfiniteQuery } from '@tanstack/react-query'
 import { confirmAlert, errorAlert, successAlert } from '@/utils/alertUtil'
 import { useGroupContext } from '@/app/(main)/group/[group-id]/_context/GroupContext'
+import useListFetch from '@/hooks/useListFetch'
 
 export default function MemberDrawer({ isOpen, close }) {
   const router = useRouter()
@@ -24,11 +24,10 @@ export default function MemberDrawer({ isOpen, close }) {
   const { ref, inView } = useInView()
   const [fetchEnable, setFetchEnable] = useState(true)
   const { groupId } = useGroupContext()
-  const { data, isFetching, hasNextPage, fetchNextPage, isFetchingNextPage } =
-    useInfiniteQuery({
-      queryKey: ['/group/members', fetchEnable, groupId],
-      initialPageParam: 0,
-      enabled: fetchEnable && isOpen,
+
+  const { data, enableNextFetch, removePage, fetchNextPage, reset } =
+    useListFetch({
+      queryKey: ['/group/members', groupId, 'POST'],
       queryFn: async ({ pageParam }) => {
         try {
           const response = await fetch('/group/members', {
@@ -46,23 +45,16 @@ export default function MemberDrawer({ isOpen, close }) {
           setFetchEnable(false)
         }
       },
-      getNextPageParam: (lastPage, allPages, lastPageParam) => {
-        if (!lastPage) return 0
-        if (!!lastPage.length) {
-          return lastPageParam + 1
-        } else {
-          return undefined
-        }
-      },
-      getPreviousPageParam: (firstPage, allPages, firstPageParam) =>
-        !!firstPageParam ? firstPageParam + 1 : undefined,
+      fetchEnable: fetchEnable && !!groupId,
+      pageSize: 10,
+      key: 'email',
     })
 
   useEffect(() => {
-    if (inView && !isFetching && !isFetchingNextPage && hasNextPage) {
+    if (inView && enableNextFetch) {
       fetchNextPage()
     }
-  }, [inView, isFetching, isFetchingNextPage, hasNextPage])
+  }, [inView, enableNextFetch])
 
   const cancelInvite = (email) =>
     confirmAlert({
@@ -75,7 +67,7 @@ export default function MemberDrawer({ isOpen, close }) {
         if (response.ok) {
           const { success } = await response.json()
           if (success) {
-            successAlert({ message: '취소했습니다.' })
+            successAlert({ message: '취소했습니다.' ,callback: () => removePage(email)})
           }
         }
       },
@@ -90,9 +82,8 @@ export default function MemberDrawer({ isOpen, close }) {
         {data?.pages.map((dataGroup, i) => (
           <React.Fragment key={i}>
             {dataGroup?.map((member) => (
-              <>
+              <React.Fragment key={member.email}>
                 <ListItem
-                  key={member.email}
                   secondaryAction={
                     member.isWaiting && (
                       <Chip
@@ -111,12 +102,12 @@ export default function MemberDrawer({ isOpen, close }) {
                   />
                 </ListItem>
                 <Divider variant="middle" component="li" />
-              </>
+              </React.Fragment>
             ))}
           </React.Fragment>
         ))}
 
-        {isOpen && !isFetching && !isFetchingNextPage && (
+        {isOpen && enableNextFetch && (
           <Grid
             sx={{
               position: 'absolute',

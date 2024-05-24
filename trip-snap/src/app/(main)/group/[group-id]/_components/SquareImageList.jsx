@@ -8,7 +8,7 @@ import React from 'react'
 import Grid from '@mui/material/Unstable_Grid2'
 
 const SquareImageList = React.forwardRef(
-  ({ list, isFetching = false }, ref) => {
+  ({ list, fetchEnable = false }, ref) => {
     const theme = useTheme()
     const isSmallerThanSm = useMediaQuery(theme.breakpoints.down('sm'))
     return (
@@ -30,7 +30,7 @@ const SquareImageList = React.forwardRef(
             <img src={photo} />
           </ImageListItem>
         ))}
-        {!isFetching && (
+        {fetchEnable && (
           <Grid
             sx={{
               position: 'absolute',

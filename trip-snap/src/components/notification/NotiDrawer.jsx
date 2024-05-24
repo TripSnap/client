@@ -19,9 +19,9 @@ import { useRouter } from 'next/navigation'
 import useFetch from '@/hooks/useFetch'
 import { useInView } from 'react-intersection-observer'
 import React, { useEffect, useState } from 'react'
-import { useInfiniteQuery } from '@tanstack/react-query'
 import { errorAlert } from '@/utils/alertUtil'
 import Grid from '@mui/material/Unstable_Grid2'
+import useListFetch from '@/hooks/useListFetch'
 
 export default function NotiDrawer() {
   const { isOpen, close } = useNotiContext()
@@ -33,11 +33,9 @@ export default function NotiDrawer() {
   const [alarmDetailId, setAlarmDetailId] = useState(null)
   const [anchorEl, setAnchorEl] = React.useState(null)
 
-  const { data, isFetching, hasNextPage, fetchNextPage, isFetchingNextPage } =
-    useInfiniteQuery({
-      queryKey: ['/notification/list', fetchEnable],
-      initialPageParam: 0,
-      enabled: fetchEnable && isOpen,
+  const { data, enableNextFetch, removePage, fetchNextPage, reset } =
+    useListFetch({
+      queryKey: ['/notification/list', 'GET'],
       queryFn: async ({ pageParam }) => {
         try {
           const response = await fetch('/notification/list', {
@@ -57,26 +55,20 @@ export default function NotiDrawer() {
           setFetchEnable(false)
         }
       },
-      getNextPageParam: (lastPage, allPages, lastPageParam) => {
-        if (!lastPage) return 0
-        if (!!lastPage.length) {
-          return lastPageParam + 1
-        } else {
-          return undefined
-        }
-      },
-      getPreviousPageParam: (firstPage, allPages, firstPageParam) =>
-        !!firstPageParam ? firstPageParam + 1 : undefined,
+      fetchEnable: fetchEnable && isOpen,
+      pageSize: 10,
+      key: 'id',
     })
 
   useEffect(() => {
-    if (inView && !isFetching && !isFetchingNextPage && hasNextPage) {
+    if (inView && enableNextFetch) {
       fetchNextPage()
     }
-  }, [inView, isFetching, isFetchingNextPage, hasNextPage])
+  }, [inView, enableNextFetch])
 
   const remove = async (id) => {
-    const response = await fetch(`/notification/${id}`, { method: 'DELETE' })
+    await fetch(`/notification/${id}`, { method: 'DELETE' })
+    removePage(id)
   }
 
   useEffect(() => {
@@ -87,8 +79,15 @@ export default function NotiDrawer() {
   }, [isOpen])
 
   return (
-    <Drawer open={isOpen} onClose={close} anchor={'right'}>
-      <List disablePadding={true}>
+    <Drawer
+      open={isOpen}
+      onClose={() => {
+        close()
+        reset()
+      }}
+      anchor={'right'}
+    >
+      <List disablePadding={true} sx={{ width: 300 }}>
         <ListSubheader
           sx={{ fontSize: 'larger', borderBottom: 1, borderColor: 'divider' }}
         >{`알람`}</ListSubheader>
@@ -98,13 +97,15 @@ export default function NotiDrawer() {
               <React.Fragment key={notification.id}>
                 <ListItem
                   secondaryAction={
-                    <IconButton
-                      edge="end"
-                      aria-label="delete"
-                      onClick={() => remove(notification.id)}
-                    >
-                      <Icon>clear</Icon>
-                    </IconButton>
+                    notification.isBroadCast ? null : (
+                      <IconButton
+                        edge="end"
+                        aria-label="delete"
+                        onClick={() => remove(notification.id)}
+                      >
+                        <Icon>clear</Icon>
+                      </IconButton>
+                    )
                   }
                   sx={{ py: 0 }}
                 >
@@ -161,11 +162,11 @@ export default function NotiDrawer() {
           </React.Fragment>
         ))}
 
-        {isOpen && !isFetching && !isFetchingNextPage && (
+        {isOpen && enableNextFetch && (
           <Grid
             sx={{
               position: 'absolute',
-              bottom: 0,
+              bottom: 10,
             }}
             ref={ref}
           ></Grid>

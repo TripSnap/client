@@ -1,6 +1,5 @@
 import CustomResponsiveDialog from '@/components/dialog/CustomResponsiveDialog'
 import { Button } from '@mui/material'
-import { useInfiniteQuery } from '@tanstack/react-query'
 import { errorAlert, successAlert } from '@/utils/alertUtil'
 import { useEffect, useState } from 'react'
 import { useGroupContext } from '@/app/(main)/group/[group-id]/_context/GroupContext'
@@ -12,6 +11,7 @@ import { useForm } from 'react-hook-form'
 import { useValidationResolver } from '@/api/scheme/useValidationResolver'
 import { RemovePhotoSchema } from '@/api/scheme/GroupSchema'
 import { useThrottle } from '@/hooks/useThrottle'
+import useListFetch from '@/hooks/useListFetch'
 
 export default function EditAlbumPhotoDialog({ isOpen, close }) {
   const { albumId, setAlbumId, groupId } = useGroupContext()
@@ -43,16 +43,14 @@ export default function EditAlbumPhotoDialog({ isOpen, close }) {
     }
   })
 
-  const { data, isFetching, hasNextPage, fetchNextPage, isFetchingNextPage } =
-    useInfiniteQuery({
-      queryKey: ['/album/photo/list', 'GET', albumId],
-      initialPageParam: 0,
-      enabled: fetchEnable && !!albumId,
+  const { data, enableNextFetch, removePage, fetchNextPage, reset } =
+    useListFetch({
+      queryKey: ['/album/photo/list', albumId, 'POST'],
       queryFn: async ({ pageParam }) => {
         try {
           const response = await fetch('/album/photo/list', {
             method: 'POST',
-            data: { pagePerCnt: 10, page: pageParam, groupId, albumId },
+            data: { pagePerCnt: 20, page: pageParam, groupId, albumId },
           })
           if (response.ok) {
             const { data } = await response.json()
@@ -65,23 +63,16 @@ export default function EditAlbumPhotoDialog({ isOpen, close }) {
           setFetchEnable(false)
         }
       },
-      getNextPageParam: (lastPage, allPages, lastPageParam) => {
-        if (!lastPage) return 0
-        if (!!lastPage.length) {
-          return lastPageParam + 1
-        } else {
-          return undefined
-        }
-      },
-      getPreviousPageParam: (firstPage, allPages, firstPageParam) =>
-        !!firstPageParam ? firstPageParam + 1 : undefined,
+      fetchEnable: fetchEnable && !!albumId,
+      pageSize: 20,
+      key: 'id',
     })
 
   useEffect(() => {
-    if (inView && !isFetching && !isFetchingNextPage && hasNextPage) {
+    if (inView && enableNextFetch) {
       fetchNextPage()
     }
-  }, [inView, isFetching, isFetchingNextPage, hasNextPage])
+  }, [inView, enableNextFetch])
 
   return (
     <CustomResponsiveDialog
@@ -90,7 +81,7 @@ export default function EditAlbumPhotoDialog({ isOpen, close }) {
         <EditableSquareImageList
           oldList={data?.pages?.flatMap((e) => e).filter((e) => !!e) || []}
           ref={ref}
-          isFetching={isFetching || isFetchingNextPage}
+          fetchEnable={fetchEnable}
           useCheckbox
           checkedIdList={watch('removePhotoIds')}
           setCheckedIdList={(checked, id) => {

@@ -40,10 +40,10 @@ export default function Page() {
           </Box>
 
           <TabPanel value="group">
-            <GroupList />
+            <GroupList modalIsOpen={modalIsOpen} />
           </TabPanel>
           <TabPanel value="friend" sx={{ pt: 0 }}>
-            <FriendList />
+            <FriendList modalIsOpen={modalIsOpen} />
           </TabPanel>
           <TabPanel value="friend-request-send" sx={{ pt: 0 }}>
             <FriendRequestSendList />

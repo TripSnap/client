@@ -9,22 +9,20 @@ import {
 import { useRouter } from 'next/navigation'
 import { useInView } from 'react-intersection-observer'
 import React, { useEffect, useState } from 'react'
-import { useInfiniteQuery } from '@tanstack/react-query'
 import { errorAlert } from '@/utils/alertUtil'
 import Grid from '@mui/material/Unstable_Grid2'
 import { cancelFriendRequest } from '@/app/(main)/group/[group-id]/_api/api'
 import useFetch from '@/hooks/useFetch'
+import useListFetch from '@/hooks/useListFetch'
 
 export default function FriendRequestSendList() {
   const router = useRouter()
   const { fetch } = useFetch(router)
   const { ref, inView } = useInView()
   const [fetchEnable, setFetchEnable] = useState(false)
-  const { data, isFetching, hasNextPage, fetchNextPage, isFetchingNextPage } =
-    useInfiniteQuery({
-      queryKey: ['/friend/send-request/list', fetchEnable],
-      initialPageParam: 0,
-      enabled: fetchEnable,
+  const { data, enableNextFetch, removePage, fetchNextPage, reset } =
+    useListFetch({
+      queryKey: ['/friend/send-request/list', 'GET'],
       queryFn: async ({ pageParam }) => {
         try {
           const response = await fetch('/friend/send-request/list', {
@@ -41,28 +39,21 @@ export default function FriendRequestSendList() {
           setFetchEnable(false)
         }
       },
-      getNextPageParam: (lastPage, allPages, lastPageParam) => {
-        if (!lastPage) return 0
-        if (!!lastPage.length) {
-          return lastPageParam + 1
-        } else {
-          return undefined
-        }
-      },
-      getPreviousPageParam: (firstPage, allPages, firstPageParam) =>
-        !!firstPageParam ? firstPageParam + 1 : undefined,
+      fetchEnable,
+      pageSize: 10,
+      key: 'email',
     })
 
   useEffect(() => {
     setFetchEnable(true)
-    return () => setFetchEnable(false)
+    return () => reset()
   }, [])
 
   useEffect(() => {
-    if (inView && !isFetching && !isFetchingNextPage && hasNextPage) {
+    if (inView && enableNextFetch) {
       fetchNextPage()
     }
-  }, [inView, isFetching, isFetchingNextPage, hasNextPage])
+  }, [inView, enableNextFetch])
   return (
     <List disablePadding={true}>
       {data?.pages.map((dataGroup, i) => (
@@ -75,7 +66,9 @@ export default function FriendRequestSendList() {
                 <Button
                   variant="text"
                   onClick={async () => {
-                    await cancelFriendRequest(fetch, friend.email)
+                    if (await cancelFriendRequest(fetch, friend.email)) {
+                      removePage(friend.email)
+                    }
                   }}
                 >
                   취소
@@ -93,7 +86,7 @@ export default function FriendRequestSendList() {
           ))}
         </React.Fragment>
       ))}
-      {!isFetching && !isFetchingNextPage && (
+      {enableNextFetch && (
         <Grid
           sx={{
             position: 'absolute',

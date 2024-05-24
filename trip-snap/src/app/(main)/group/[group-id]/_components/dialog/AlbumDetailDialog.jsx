@@ -15,12 +15,12 @@ import AddAlbumPhotoDialog from './AddAlbumPhotoDialog'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { usePlaceListContext } from '@/app/(main)/group/[group-id]/_components/map/PlaceListProvider'
 import { useGroupContext } from '@/app/(main)/group/[group-id]/_context/GroupContext'
-import { useInfiniteQuery } from '@tanstack/react-query'
 import { confirmAlert, errorAlert, successAlert } from '@/utils/alertUtil'
 import { useInView } from 'react-intersection-observer'
 import useFetch from '@/hooks/useFetch'
 import { useRouter } from 'next/navigation'
 import { debounce } from '@/utils/utils'
+import useListFetch from '@/hooks/useListFetch'
 
 export default function AlbumDetailDialog({ isOpen, close }) {
   const { placeList } = usePlaceListContext()
@@ -41,16 +41,14 @@ export default function AlbumDetailDialog({ isOpen, close }) {
     }
   }, [albumId, placeList])
 
-  const { data, isFetching, hasNextPage, fetchNextPage, isFetchingNextPage } =
-    useInfiniteQuery({
-      queryKey: ['/album/photo/list', 'GET', albumId],
-      initialPageParam: 0,
-      enabled: fetchEnable && !!albumId,
+  const { data, enableNextFetch, fetchNextPage, reset, refetchLastPage } =
+    useListFetch({
+      queryKey: ['/album/photo/list', albumId, 'POST'],
       queryFn: async ({ pageParam }) => {
         try {
           const response = await fetch('/album/photo/list', {
             method: 'POST',
-            data: { pagePerCnt: 10, page: pageParam, groupId, albumId },
+            data: { pagePerCnt: 20, page: pageParam, groupId, albumId },
           })
           if (response.ok) {
             const { data } = await response.json()
@@ -63,23 +61,16 @@ export default function AlbumDetailDialog({ isOpen, close }) {
           setFetchEnable(false)
         }
       },
-      getNextPageParam: (lastPage, allPages, lastPageParam) => {
-        if (!lastPage) return 0
-        if (!!lastPage.length) {
-          return lastPageParam + 1
-        } else {
-          return undefined
-        }
-      },
-      getPreviousPageParam: (firstPage, allPages, firstPageParam) =>
-        !!firstPageParam ? firstPageParam + 1 : undefined,
+      fetchEnable: fetchEnable && !!albumId,
+      pageSize: 20,
+      key: 'id',
     })
 
   useEffect(() => {
-    if (inView && !isFetching && !isFetchingNextPage && hasNextPage) {
+    if (inView && enableNextFetch) {
       fetchNextPage()
     }
-  }, [inView, isFetching, isFetchingNextPage, hasNextPage])
+  }, [inView, enableNextFetch])
 
   const removeAlbum = debounce(1000, async () => {
     await confirmAlert({
@@ -138,7 +129,7 @@ export default function AlbumDetailDialog({ isOpen, close }) {
               <SquareImageList
                 list={data?.pages?.flatMap((e) => e).filter((e) => !!e) || []}
                 ref={ref}
-                isFetching={isFetching || isFetchingNextPage}
+                fetchEnable={enableNextFetch}
               />
 
               <SpeedDial
@@ -174,13 +165,19 @@ export default function AlbumDetailDialog({ isOpen, close }) {
       {openAddModal && (
         <AddAlbumPhotoDialog
           isOpen={openAddModal}
-          close={() => setOpenAddModal(false)}
+          close={() => {
+            refetchLastPage()
+            setOpenAddModal(false)
+          }}
         />
       )}
       {openEditModal && (
         <EditAlbumPhotoDialog
           isOpen={openEditModal}
-          close={() => setOpenEditModal(false)}
+          close={() => {
+            reset()
+            setOpenEditModal(false)
+          }}
         />
       )}
     </>

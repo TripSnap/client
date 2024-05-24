@@ -19,7 +19,7 @@ const EditableSquareImageList = React.forwardRef(
       checkedIdList, // 체크박스 리스트
       setCheckedIdList, // 체크박스 리스트 처리 함수
       removeNewListItem, // x버튼 눌렀을 때 처리
-      isFetching = false,
+      fetchEnable = false,
       useCheckbox = false,
     },
     ref
@@ -32,6 +32,7 @@ const EditableSquareImageList = React.forwardRef(
         sx={{
           m: 0,
           position: 'relative',
+          overflow: 'hidden',
         }}
       >
         {newList?.map(({ id, photo }) => (
@@ -45,7 +46,10 @@ const EditableSquareImageList = React.forwardRef(
             <img src={photo} />
             <ImageListItemBar
               actionIcon={
-                <IconButton sx={{ p: 0, color: 'white' }}>
+                <IconButton
+                  sx={{ p: 0, color: 'white' }}
+                  onClick={() => removeNewListItem(id)}
+                >
                   <Icon>close</Icon>
                 </IconButton>
               }
@@ -77,7 +81,7 @@ const EditableSquareImageList = React.forwardRef(
             )}
           </ImageListItem>
         ))}
-        {!isFetching && (
+        {fetchEnable && (
           <Grid
             sx={{
               position: 'absolute',

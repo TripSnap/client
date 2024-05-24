@@ -14,7 +14,7 @@ import {
 import React from 'react'
 import useFetch from '@/hooks/useFetch'
 
-export default function GroupItem({ data, router, handleClick }) {
+export default function GroupItem({ data, router, handleClick, removePage }) {
   const { fetch } = useFetch(router)
   const CardArea = ({ children }) => {
     return handleClick ? (
@@ -55,14 +55,18 @@ export default function GroupItem({ data, router, handleClick }) {
                   >
                     <Button
                       onClick={async () => {
-                        await allowGroupInvite(fetch, data.id)
+                        if (await allowGroupInvite(fetch, data.id)) {
+                          removePage && removePage(data.id)
+                        }
                       }}
                     >
                       수락
                     </Button>
                     <Button
                       onClick={async () => {
-                        await denyGroupInvite(fetch, data.id)
+                        if (await denyGroupInvite(fetch, data.id)) {
+                          removePage && removePage(data.id)
+                        }
                       }}
                     >
                       거절

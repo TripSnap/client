@@ -13,7 +13,6 @@ import {
 import { useRouter } from 'next/navigation'
 import { useInView } from 'react-intersection-observer'
 import React, { useEffect, useState } from 'react'
-import { useInfiniteQuery } from '@tanstack/react-query'
 import { errorAlert } from '@/utils/alertUtil'
 import Grid from '@mui/material/Unstable_Grid2'
 import {
@@ -22,30 +21,17 @@ import {
   removeFriend,
 } from '@/app/(main)/group/[group-id]/_api/api'
 import useFetch from '@/hooks/useFetch'
+import useListFetch from '@/hooks/useListFetch'
 
-export default function FriendList() {
+export default function FriendList({ modalIsOpen }) {
   const router = useRouter()
   const { fetch } = useFetch(router)
   const { ref, inView } = useInView()
   const [fetchEnable, setFetchEnable] = useState(false)
-  const queryClient = useQueryClient()
 
-  const [removeKeySet, setRemoveKeySet] = useState(new Set())
-  const addRemoveKey = (key) => {
-    setRemoveKeySet(new Set([...Array.from(removeKeySet), key]))
-  }
-
-  const {
-    data,
-    isFetching,
-    hasNextPage,
-    fetchNextPage,
-    isFetchingNextPage,
-  } = useInfiniteQuery(
-    {
-      queryKey: ['/friend/list'],
-      initialPageParam: 0,
-      enabled: fetchEnable,
+  const { data, enableNextFetch, removePage, fetchNextPage, reset } =
+    useListFetch({
+      queryKey: ['/friend/list', 'all', 'GET'],
       queryFn: async ({ pageParam }) => {
         try {
           const response = await fetch('/friend/list', {
@@ -62,105 +48,91 @@ export default function FriendList() {
           setFetchEnable(false)
         }
       },
-      getNextPageParam: (lastPage, allPages, lastPageParam) => {
-        if (!lastPage) return 0
-        if (!!lastPage.length) {
-          return lastPageParam + 1
-        } else {
-          return undefined
-        }
-      },
-      getPreviousPageParam: (firstPage, allPages, firstPageParam) =>
-        !!firstPageParam ? firstPageParam + 1 : undefined,
+      fetchEnable,
+      pageSize: 10,
+      key: 'email',
     })
 
   useEffect(() => {
     setFetchEnable(true)
-    return () => setFetchEnable(false)
+    return () => reset()
   }, [])
 
   useEffect(() => {
-    if (inView && !isFetching && !isFetchingNextPage && hasNextPage) {
+    if (inView && enableNextFetch) {
       fetchNextPage()
     }
-  }, [inView, isFetching, isFetchingNextPage, hasNextPage])
+  }, [inView, enableNextFetch])
+
   return (
     <List disablePadding={true}>
       {data?.pages.map((dataGroup, i) => (
         <React.Fragment key={i}>
-          {dataGroup?.map(
-            (friend) =>
-              !removeKeySet.has(friend.email) && (
-                <ListItem
-                  divider={true}
-                  key={friend.email}
-                  secondaryAction={
-                    friend.isWaiting ? (
-                      <ButtonGroup
-                        variant="outlined"
-                        aria-label="Basic button group"
-                      >
-                        <Button
-                          onClick={async () => {
-                            if (await allowFriendRequest(fetch, friend.email)) {
-                              addRemoveKey(friend.email)
-                              refetchLastPage()
-                            }
-                          }}
-                        >
-                          수락
-                        </Button>
-                        <Button
-                          onClick={async () => {
-                            if (await denyFriendRequest(fetch, friend.email)) {
-                              addRemoveKey(friend.email)
-                            }
-                          }}
-                        >
-                          거절
-                        </Button>
-                      </ButtonGroup>
-                    ) : (
-                      <IconButton
-                        edge="end"
-                        aria-label="delete"
-                        onClick={async () => {
-                          if (await removeFriend(fetch, friend.email)) {
-                            addRemoveKey(friend.email)
-                          }
-                        }}
-                      >
-                        <Icon>delete</Icon>
-                      </IconButton>
-                    )
-                  }
-                >
-                  <ListItemAvatar>
-                    <Avatar>A</Avatar>
-                  </ListItemAvatar>
-                  <ListItemText
-                    primary={
-                      friend.isWaiting ? (
-                        <>
-                          {friend.nickname}&nbsp;
-                          <Chip
-                            label="친구 신청"
-                            color="primary"
-                            size={'small'}
-                          />
-                        </>
-                      ) : (
-                        friend.nickname
-                      )
-                    }
-                    secondary={friend.email}
-                  />
-                </ListItem>
-              )
-          )}
+          {dataGroup?.map((friend) => (
+            <ListItem
+              divider={true}
+              key={friend.email}
+              secondaryAction={
+                friend.isWaiting ? (
+                  <ButtonGroup
+                    variant="outlined"
+                    aria-label="Basic button group"
+                  >
+                    <Button
+                      onClick={async () => {
+                        if (await allowFriendRequest(fetch, friend.email)) {
+                          removePage(friend.email)
+                        }
+                      }}
+                    >
+                      수락
+                    </Button>
+                    <Button
+                      onClick={async () => {
+                        if (await denyFriendRequest(fetch, friend.email)) {
+                          removePage(friend.email)
+                        }
+                      }}
+                    >
+                      거절
+                    </Button>
+                  </ButtonGroup>
+                ) : (
+                  <IconButton
+                    edge="end"
+                    aria-label="delete"
+                    onClick={async () => {
+                      if (await removeFriend(fetch, friend.email)) {
+                        removePage(friend.email)
+                      }
+                    }}
+                  >
+                    <Icon>delete</Icon>
+                  </IconButton>
+                )
+              }
+            >
+              <ListItemAvatar>
+                <Avatar>A</Avatar>
+              </ListItemAvatar>
+              <ListItemText
+                primary={
+                  friend.isWaiting ? (
+                    <>
+                      {friend.nickname}&nbsp;
+                      <Chip label="친구 신청" color="primary" size={'small'} />
+                    </>
+                  ) : (
+                    friend.nickname
+                  )
+                }
+                secondary={friend.email}
+              />
+            </ListItem>
+          ))}
         </React.Fragment>
       ))}
-      {!isFetching && !isFetchingNextPage && (
+      {enableNextFetch && (
         <Grid
           sx={{
             position: 'absolute',

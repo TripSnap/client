@@ -12,12 +12,12 @@ import {
 import InputLabel from '@/components/input/InputLabel'
 import PaperInput from '@/components/input/PaperInput'
 import React, { useEffect, useState } from 'react'
-import { useInfiniteQuery } from '@tanstack/react-query'
 import { errorAlert } from '@/utils/alertUtil'
 import { useRouter } from 'next/navigation'
 import { useInView } from 'react-intersection-observer'
 import Grid from '@mui/material/Unstable_Grid2'
 import useFetch from '@/hooks/useFetch'
+import useListFetch from '@/hooks/useListFetch'
 
 export const AddGroupForm = ({ control, setValue }) => {
   const router = useRouter()
@@ -25,48 +25,39 @@ export const AddGroupForm = ({ control, setValue }) => {
   const { ref, inView } = useInView()
   const [fetchEnable, setFetchEnable] = useState(true)
   const [emails, setEmails] = useState([])
-  const { data, isFetching, hasNextPage, fetchNextPage, isFetchingNextPage } =
-    useInfiniteQuery({
-      queryKey: ['friendList'],
-      initialPageParam: 0,
-      enabled: fetchEnable,
-      queryFn: async ({ pageParam }) => {
-        try {
-          const response = await fetch('/friend/list', {
-            data: { pagePerCnt: 10, page: pageParam, option: 'active' },
-          })
-          if (response.ok) {
-            const { data } = await response.json()
-            return data
-          } else {
-            setFetchEnable(false)
-            errorAlert({ message: '데이터를 가져오는 데 실패했습니다.' })
-          }
-        } catch (e) {
-          setFetchEnable(false)
-        }
-      },
-      getNextPageParam: (lastPage, allPages, lastPageParam) => {
-        if (!lastPage) return 0
-        if (!!lastPage.length) {
-          return lastPageParam + 1
+
+  const { data, enableNextFetch, fetchNextPage } = useListFetch({
+    queryKey: ['/friend/list', 'active', 'GET'],
+    queryFn: async ({ pageParam }) => {
+      try {
+        const response = await fetch('/friend/list', {
+          data: { pagePerCnt: 10, page: pageParam, option: 'active' },
+        })
+        if (response.ok) {
+          const { data } = await response.json()
+          return data
         } else {
-          return undefined
+          setFetchEnable(false)
+          errorAlert({ message: '데이터를 가져오는 데 실패했습니다.' })
         }
-      },
-      getPreviousPageParam: (firstPage, allPages, firstPageParam) =>
-        !!firstPageParam ? firstPageParam + 1 : undefined,
-    })
+      } catch (e) {
+        setFetchEnable(false)
+      }
+    },
+    fetchEnable,
+    pageSize: 10,
+    key: 'email',
+  })
 
   useEffect(() => {
     setValue('memberEmails', emails)
   }, [emails])
 
   useEffect(() => {
-    if (inView && !isFetching && !isFetchingNextPage && hasNextPage) {
+    if (inView && enableNextFetch) {
       fetchNextPage()
     }
-  }, [inView, isFetching, isFetchingNextPage, hasNextPage])
+  }, [inView, enableNextFetch])
 
   const handleCheckbox = (checked, email) => {
     if (checked) {
@@ -147,7 +138,7 @@ export const AddGroupForm = ({ control, setValue }) => {
                 ))}
               </React.Fragment>
             ))}
-            {!isFetching && !isFetchingNextPage && (
+            {enableNextFetch && (
               <Grid
                 sx={{
                   position: 'absolute',
