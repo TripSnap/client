@@ -43,7 +43,10 @@ const EditableSquareImageList = React.forwardRef(
               position: 'relative',
             }}
           >
-            <img src={photo} />
+            <img
+              src={photo}
+              style={{ width: '100%', objectFit: 'cover', maxHeight: '100%' }}
+            />
             <ImageListItemBar
               actionIcon={
                 <IconButton

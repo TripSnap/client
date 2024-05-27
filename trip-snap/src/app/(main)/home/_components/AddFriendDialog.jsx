@@ -95,7 +95,9 @@ export default function AddFriendDialog({ isOpen, close }) {
       <Button
         variant="text"
         onClick={async () => {
-          await sendFriendRequest(fetch, searchUser.email)
+          if (await sendFriendRequest(fetch, searchUser.email)) {
+            setSearchUser({ ...searchUser, isSendRequest: true })
+          }
         }}
       >
         친구 신청
