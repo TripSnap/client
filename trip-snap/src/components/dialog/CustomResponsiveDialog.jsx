@@ -48,7 +48,12 @@ export default function CustomResponsiveDialog({
       >
         <Icon>close</Icon>
       </IconButton>
-      <DialogContent dividers>{body}</DialogContent>
+      <DialogContent
+        dividers
+        sx={{ display: 'flex', flexDirection: 'column', minHeight: '430px' }}
+      >
+        {body}
+      </DialogContent>
       {footer && <DialogActions>{footer}</DialogActions>}
     </Dialog>
   )

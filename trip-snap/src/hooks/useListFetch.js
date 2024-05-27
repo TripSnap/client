@@ -1,4 +1,5 @@
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
+import { useMemo } from 'react'
 
 export default function useListFetch({
   queryKey,
@@ -65,17 +66,29 @@ export default function useListFetch({
     const [queryData] = queryClient.getQueriesData({ queryKey })
     const [, data] = queryData
     if (data) {
-      const [lastPage] = data.pageParams.slice(-1)
-      if (lastPage >= 0) {
-        const newData = await queryFn({ pageParam: lastPage })
+      const [lastPageParam] = data.pageParams.slice(-1)
+      if (lastPageParam >= 0) {
+        const newData = await queryFn({ pageParam: lastPageParam })
         queryClient.setQueriesData({ queryKey }, (data) => ({
           ...data,
-          pageParams: [...data.pageParams.slice(0, -1), lastPage],
+          pageParams: [...data.pageParams.slice(0, -1), lastPageParam],
           pages: [...data.pages.slice(0, -1), newData],
         }))
       }
     }
   }
+
+  const isEmpty = useMemo(() => {
+    let isEmpty = true
+    const [queryData] = queryClient.getQueriesData({ queryKey })
+    const [, data] = queryData
+    if (data) {
+      const [firstPage] = data.pages
+      isEmpty = firstPage.length === 0
+    }
+
+    return isEmpty
+  }, [data])
 
   return {
     data,
@@ -86,5 +99,6 @@ export default function useListFetch({
     removeLastPage,
     refetchLastPage,
     reset,
+    isEmpty,
   }
 }
