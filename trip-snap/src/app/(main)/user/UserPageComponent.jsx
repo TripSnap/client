@@ -10,20 +10,27 @@ import { useForm, useFormState } from 'react-hook-form'
 import { errorAlert, successAlert } from '@/utils/alertUtil'
 import { useThrottle } from '@/hooks/useThrottle'
 import Grid from '@mui/material/Unstable_Grid2'
-import { Avatar, Box, Button, Divider, Paper } from '@mui/material'
+import { Box, Button, Divider, Paper } from '@mui/material'
 import InputLabel from '@/components/input/InputLabel'
 import PaperInput from '@/components/input/PaperInput'
+import { useState } from 'react'
+import EditPhotoForm from '@/app/(main)/user/EditPhotoForm'
+import { loadingPopup } from '@/utils/loadingUtil'
 
 export default function UserPageComponent({ user }) {
   const router = useRouter()
-  const { fetch } = useFetch(router)
+  const { fetch: apiFetch } = useFetch(router)
+  const [imageBinaryData, setImageBinaryData] = useState(null)
+
   const userDataResolver = useValidationResolver(
     updateMemberDataSchema.noUnknown()
   )
   const {
     handleSubmit: handleUserData,
     control: userDataControl,
-    trigger,
+    setValue: setUserData,
+    getValues: getUserData,
+    reset: resetUserData,
   } = useForm({
     resolver: userDataResolver,
     mode: 'all',
@@ -37,15 +44,22 @@ export default function UserPageComponent({ user }) {
     control: userDataControl,
   })
   const userPasswordResolver = useValidationResolver(updatePasswordSchema)
-  const { handleSubmit: handleUserPassword, control: userPasswordControl } =
-    useForm({
-      resolver: userPasswordResolver,
-      mode: 'onChange',
-    })
+  const {
+    handleSubmit: handleUserPassword,
+    control: userPasswordControl,
+    reset: resetUserPassword,
+  } = useForm({
+    resolver: userPasswordResolver,
+    mode: 'onChange',
+  })
 
   const { callback: userDataSubmit } = useThrottle(
     2000,
-    async (data) => {
+    async () => {
+      if (imageBinaryData) {
+        await loadingPopup(uploadImage, '사진을 업로드중입니다..')
+      }
+      const data = getUserData()
       const body = {}
       for (const key of Object.keys(data)) {
         if (data[key] !== defaultUserData[key]) {
@@ -53,14 +67,20 @@ export default function UserPageComponent({ user }) {
         }
       }
       if (Object.keys(body).length > 0) {
-        const response = await fetch('/account/user', {
+        const response = await apiFetch('/account/user', {
           method: 'PATCH',
           data: body,
         })
         if (response.ok) {
           const data = await response.json()
           if (data.success) {
-            successAlert({ message: '변경이 완료되었습니다.' })
+            successAlert({
+              message: '변경이 완료되었습니다.',
+              callback: () => {
+                setImageBinaryData(null)
+                resetUserData({ ...getUserData(), ...body })
+              },
+            })
           } else {
             errorAlert({ message: data.message || '변경을 실패했습니다.' })
           }
@@ -71,18 +91,21 @@ export default function UserPageComponent({ user }) {
         errorAlert({ message: '변경된 데이터가 없습니다.' })
       }
     },
-    [defaultUserData]
+    [defaultUserData, imageBinaryData]
   )
   const { callback: userPasswordSubmit } = useThrottle(2000, async (data) => {
     const { password, newPassword } = data
-    const response = await fetch('/account/user/password', {
+    const response = await apiFetch('/account/user/password', {
       method: 'PATCH',
       data: { password, newPassword },
     })
     if (response.ok) {
       const data = await response.json()
       if (data.success) {
-        successAlert({ message: '변경이 완료되었습니다.' })
+        successAlert({
+          message: '변경이 완료되었습니다.',
+          callback: () => resetUserPassword({}),
+        })
       } else {
         errorAlert({ message: data.message || '변경을 실패했습니다.' })
       }
@@ -90,6 +113,28 @@ export default function UserPageComponent({ user }) {
       errorAlert({ message: '변경을 실패했습니다.' })
     }
   })
+
+  const uploadImage = async () => {
+    let response = await apiFetch(`/account/user/photo/upload-authority`, {
+      method: 'POST',
+      data: { type: imageBinaryData.type },
+    })
+    if (response.ok) {
+      const data = await response.json()
+      response = await fetch(data.uploadUrl, {
+        method: 'PUT',
+        body: imageBinaryData.data,
+        headers: {
+          'Content-Type': data.type,
+        },
+      })
+      if (response.ok) {
+        setUserData('photo', data.filename)
+      } else {
+        await errorAlert({ message: '사진 업로드를 실패했습니다.' })
+      }
+    }
+  }
 
   return (
     <Grid container justifyContent={'center'} rowSpacing={2}>
@@ -102,19 +147,11 @@ export default function UserPageComponent({ user }) {
 
           <Grid container sx={{ p: 3 }} gap={2} justifyContent={'center'}>
             <Grid xs={12} sx={{ display: 'flex' }} container gap={1}>
-              <Grid>
-                <Avatar
-                  alt="Remy Sharp"
-                  src="/static/images/avatar/1.jpg"
-                  sx={{ width: 100, height: 100 }}
-                  variant="square"
-                />
-              </Grid>
-              <Grid display={'flex'} sx={{ flexDirection: 'column' }}>
-                <Button sx={{ mt: 'auto' }} disabled={isLoading}>
-                  사진 변경
-                </Button>
-              </Grid>
+              <EditPhotoForm
+                setImageBinaryData={setImageBinaryData}
+                user={user}
+                removeUserPhoto={() => setUserData('photo', '')}
+              />
             </Grid>
             <Grid xs={12}>
               <InputLabel name={'닉네임'} level={4} />

@@ -60,7 +60,7 @@ export const updateMemberDataSchema = object({
     Regexp.NICKNAME,
     '5~20글자의 영어 또는 한글로 시작해야 합니다.'
   ),
-  photo: string().min(10).max(50).notRequired(),
+  photo: string().max(50).notRequired(),
 })
 
 export const updatePasswordSchema = object({
