@@ -1,6 +1,7 @@
 import Grid from '@mui/material/Unstable_Grid2'
 import { Avatar, Button } from '@mui/material'
 import { useRef, useState } from 'react'
+import useImageManager from '@/hooks/useImageManager'
 
 export default function EditPhotoForm({
   setImageBinaryData,
@@ -11,29 +12,18 @@ export default function EditPhotoForm({
   const [thumbnail, setThumbnail] = useState(
     user.photo ? process.env.NEXT_PUBLIC_PHOTO_URL + user.photo : null
   )
-
-  const uploadEvent = (event) => {
-    const {
-      target: { files },
-    } = event
-
-    const [file] = files
-    const binaryReader = new FileReader()
-    binaryReader.addEventListener('load', async (event) => {
-      setImageBinaryData({ data: event.target.result, type: file.type })
-    })
-    binaryReader.readAsArrayBuffer(file)
-
-    const thumbnailReader = new FileReader()
-    thumbnailReader.addEventListener('load', async (event) => {
-      setThumbnail(event.target.result)
-    })
-    thumbnailReader.readAsDataURL(file)
-    inputRef.current.value = null
-  }
+  const { uploadEvent } = useImageManager({
+    readBlobCallback: (blobData) => {
+      const [data] = blobData
+      setImageBinaryData(data)
+    },
+    readDataUrlCallback: (dataURL) => {
+      const [{ data }] = dataURL
+      setThumbnail(data)
+    },
+  })
 
   const removeImage = () => {
-    inputRef.current.value = null
     setImageBinaryData(null)
     setThumbnail(null)
     removeUserPhoto()
@@ -59,7 +49,10 @@ export default function EditPhotoForm({
         </Button>
       </Grid>
       <input
-        onChange={uploadEvent}
+        onChange={async (e) => {
+          await uploadEvent(e)
+          inputRef.current.value = null
+        }}
         type={'file'}
         ref={inputRef}
         accept={'image/*'}
