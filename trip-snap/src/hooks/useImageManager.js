@@ -27,7 +27,7 @@ export default function useImageManager({
         [...files].map((file, index) => readBlobData(id(index), file))
       )
       const newBlobData = promiseResult
-        .filter((promise) => promise.status === 'fulfilled')
+        .filter(({ status }) => status === 'fulfilled')
         .map(({ value }) => value)
       readBlobCallback(newBlobData, setBlobData, blobData || [])
     }
@@ -37,7 +37,7 @@ export default function useImageManager({
         [...files].map((file, index) => readDataURL(id(index), file))
       )
       const newDataURL = promiseResult
-        .filter((promise) => promise.status === 'fulfilled')
+        .filter(({ status }) => status === 'fulfilled')
         .map(({ value }) => value)
       readDataUrlCallback(newDataURL, setDataURL, dataURL || [])
     }
@@ -70,13 +70,13 @@ export default function useImageManager({
   const removeData = (removeId) => {
     const removeBlobDataIndex = blobData?.findIndex(({ id }) => removeId === id)
     const removeDataURLIndex = dataURL?.findIndex(({ id }) => removeId === id)
-    if (removeBlobDataIndex) {
+    if (removeBlobDataIndex > -1) {
       setBlobData([
         ...blobData.slice(0, removeBlobDataIndex),
         ...blobData.slice(removeBlobDataIndex + 1),
       ])
     }
-    if (removeDataURLIndex) {
+    if (removeDataURLIndex > -1) {
       setDataURL([
         ...dataURL.slice(0, removeDataURLIndex),
         ...dataURL.slice(removeDataURLIndex + 1),

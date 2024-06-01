@@ -35,7 +35,7 @@ const EditableSquareImageList = React.forwardRef(
           overflow: 'hidden',
         }}
       >
-        {newList?.map(({ id, photo }) => (
+        {newList?.map(({ id, data }) => (
           <ImageListItem
             key={id}
             sx={{
@@ -44,7 +44,7 @@ const EditableSquareImageList = React.forwardRef(
             }}
           >
             <img
-              src={photo}
+              src={data}
               style={{ width: '100%', objectFit: 'cover', maxHeight: '100%' }}
             />
             <ImageListItemBar
@@ -59,7 +59,7 @@ const EditableSquareImageList = React.forwardRef(
             />
           </ImageListItem>
         ))}
-        {oldList?.map(({ id, photo }) => (
+        {oldList?.map(({ id, data }) => (
           <ImageListItem
             key={id}
             sx={{
@@ -67,7 +67,7 @@ const EditableSquareImageList = React.forwardRef(
               position: 'relative',
             }}
           >
-            <img src={photo} />
+            <img src={data} />
 
             {useCheckbox && (
               <ImageListItemBar
