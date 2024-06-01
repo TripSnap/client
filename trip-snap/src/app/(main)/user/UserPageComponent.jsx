@@ -56,39 +56,43 @@ export default function UserPageComponent({ user }) {
   const { callback: userDataSubmit } = useThrottle(
     2000,
     async () => {
-      if (imageBinaryData) {
-        await loadingPopup(uploadImage, '사진을 업로드중입니다..')
-      }
-      const data = getUserData()
-      const body = {}
-      for (const key of Object.keys(data)) {
-        if (data[key] !== defaultUserData[key]) {
-          body[key] = data[key]
+      try {
+        if (imageBinaryData) {
+          await loadingPopup(uploadImage, '사진을 업로드중입니다..')
         }
-      }
-      if (Object.keys(body).length > 0) {
-        const response = await apiFetch('/account/user', {
-          method: 'PATCH',
-          data: body,
-        })
-        if (response.ok) {
-          const data = await response.json()
-          if (data.success) {
-            successAlert({
-              message: '변경이 완료되었습니다.',
-              callback: () => {
-                setImageBinaryData(null)
-                resetUserData({ ...getUserData(), ...body })
-              },
-            })
+        const data = getUserData()
+        const body = {}
+        for (const key of Object.keys(data)) {
+          if (data[key] !== defaultUserData[key]) {
+            body[key] = data[key]
+          }
+        }
+        if (Object.keys(body).length > 0) {
+          const response = await apiFetch('/account/user', {
+            method: 'PATCH',
+            data: body,
+          })
+          if (response.ok) {
+            const data = await response.json()
+            if (data.success) {
+              successAlert({
+                message: '변경이 완료되었습니다.',
+                callback: () => {
+                  setImageBinaryData(null)
+                  resetUserData({ ...getUserData(), ...body })
+                },
+              })
+            } else {
+              errorAlert({ message: data.message || '변경을 실패했습니다.' })
+            }
           } else {
-            errorAlert({ message: data.message || '변경을 실패했습니다.' })
+            errorAlert({ message: '변경을 실패했습니다.' })
           }
         } else {
-          errorAlert({ message: '변경을 실패했습니다.' })
+          errorAlert({ message: '변경된 데이터가 없습니다.' })
         }
-      } else {
-        errorAlert({ message: '변경된 데이터가 없습니다.' })
+      } catch (e) {
+        errorAlert({ message: e.message })
       }
     },
     [defaultUserData, imageBinaryData]
@@ -115,24 +119,28 @@ export default function UserPageComponent({ user }) {
   })
 
   const uploadImage = async () => {
-    let response = await apiFetch(`/account/user/photo/upload-authority`, {
-      method: 'POST',
-      data: { type: imageBinaryData.type },
-    })
-    if (response.ok) {
-      const data = await response.json()
-      response = await fetch(data.uploadUrl, {
-        method: 'PUT',
-        body: imageBinaryData.data,
-        headers: {
-          'Content-Type': data.type,
-        },
+    try {
+      let response = await apiFetch(`/account/user/photo/upload-authority`, {
+        method: 'POST',
+        data: { type: imageBinaryData.type },
       })
       if (response.ok) {
-        setUserData('photo', data.filename)
-      } else {
-        await errorAlert({ message: '사진 업로드를 실패했습니다.' })
+        const data = await response.json()
+        response = await fetch(data.uploadUrl, {
+          method: 'PUT',
+          body: imageBinaryData.data,
+          headers: {
+            'Content-Type': data.type,
+          },
+        })
+        if (response.ok) {
+          setUserData('photo', data.filename)
+        } else {
+          throw new Error()
+        }
       }
+    } catch (e) {
+      throw new Error('사진 업로드를 실패했습니다.')
     }
   }
 

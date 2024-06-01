@@ -1,13 +1,20 @@
 import Swal from 'sweetalert2'
 
-export const loadingPopup = async (fn, message) => {
-  return Swal.fire({
-    html: '<span></span>',
-    didOpen: async (popup) => {
-      Swal.showLoading()
-      popup.querySelector('span').textContent = message
-      await fn()
-      Swal.close()
-    },
+export const loadingPopup = (fn, message) =>
+  new Promise((res, rej) => {
+    Swal.fire({
+      html: '<span></span>',
+      didOpen: async (popup) => {
+        try {
+          Swal.showLoading()
+          popup.querySelector('span').textContent = message
+          await fn()
+          res()
+        } catch (e) {
+          rej(e)
+        } finally {
+          Swal.close()
+        }
+      },
+    })
   })
-}
